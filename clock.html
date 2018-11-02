@@ -124,7 +124,7 @@
 			toggleSecondHand: true,
 			checked: true,
 			lastTimeSet: [12, 0, 0],
-			interval: 0
+			checkInterval: 0
 		},
 		created: function() {
 			// set to 12 on start
@@ -139,10 +139,10 @@
 				this.selectedFace = this.clockFaces[4]
 			})();
 			// set to current time
-			let that = this
-			this.interval = setInterval(function() {
-				that.setOriginalTime(new Date())
-			}, 1000)
+			// let that = this
+			// this.interval = setInterval(function() {
+			// 	that.setOriginalTime(new Date())
+			// }, 1000)
 		},
 		computed: {
 			// dynamic aria tag computer
@@ -190,13 +190,19 @@
 				let hour = date.getHours()
 				let min = date.getMinutes()
 				let sec = date.getSeconds()
-				return [hour, min, sec]
+				let day = date.getDay()
+				let month = date.getMonth()
+				let year = date.getFullYear()
+				return [year, month, day, hour, min, sec]
 			},
 			setOriginalTime: function(input) {
 				let result = this.timeExtractFromDate(input)
-				let hour = result[0]
-				let min = result[1]
-				let sec = result[2]
+				let year = result[0]
+				let month = result[1]
+				let day = result[2]
+				let hour = result[3]
+				let min = result[4]
+				let sec = result[5]
 
 				this.timeToDegrees(hour, "hour");
 				this.timeToDegrees(min, "min");
@@ -210,23 +216,91 @@
 			setEventTime: function(input) {
 				clearInterval(this.interval)
 				let result = this.timeExtractFromDate(input)
-				let hour = result[0]
-				let min = result[1]
-				let sec = result[2]
-
+				let hour = result[3]
+				let min = result[4]
+				let sec = result[5]
+				// console.log(hour)
+				// console.log(min)
+				// console.log(sec)
 				this.timeToDegrees(hour, "hour");
-				// this.timeToDegrees(min, "min");
-				// this.timeToDegrees(sec, "sec");
+				this.timeToDegrees(min, "min");
+				this.timeToDegrees(sec, "sec");
 
 				this.lastTimeSet = [hour, min, sec]
 
 			},
 			eventTrigger: function(input) {
-				console.log(input)
+				// console.log('input', this.timeExtractFromDate(input))
+
+				let result = this.timeExtractFromDate(input)
+				let year = result[0]
+				let month = result[1]
+				let day = result[2]
+				let hour = result[3]
+				let min = result[4]
+				let sec = result[5]
+
 				let that = this
-				setInterval(function() {
-					that.setEventTime(input)
-				}, 1000)
+				// update date
+				console.log('INTERVAL', this.checkInterval)
+				// clear intervals
+				if (this.interval !== 0) {
+					clearInterval(this.checkInterval)
+				}
+				let updater = function() {
+					sec = sec + 1
+					if (sec > 60) {
+						sec = 1
+						min = min + 1
+						console.log('increment min', min)
+					}
+					if (min > 60) {
+						min = 0
+						hour = hour + 1
+						console.log('increment hour', hour)
+					}
+					if (hour > 24) {
+						hour = 0
+						day = day + 1
+						console.log('increment day', day)
+
+					}
+					if (month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month === 10 || month || 12) {
+						console.log('inside month', month)
+
+						if (day >= 31) {
+							day = 1
+							month = month + 1
+							console.log('increment month 31', month)
+
+						}
+					} else if (month !== 2) {
+						if (day >= 30) {
+							day = 1
+							month = month + 1
+							console.log('increment month 30', month)
+
+						}
+					} else {
+						if (day >= 28) {
+							day = 1
+							month = month + 1
+							console.log('increment month FEB', month)
+
+						}
+					}
+					console.log('year', year)
+					console.log('month', month)
+					console.log('day', day)
+					console.log('sec', sec)
+					console.log('min', min)
+					console.log('hour', hour)
+					console.log(new Date(year, month, day, hour, min, sec))
+					let newDate = new Date(year, month, day, hour, min, sec)
+					// make new time with updated Date
+					that.setEventTime(newDate)
+				}
+				this.checkInterval = setInterval(updater, 1000)
 			},
 			timeToDegrees: function(time, type, onLoad) {
 				switch (type) {
