@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<script type="text/javascript" src="https://unpkg.com/vue@2.5.10/dist/vue.js"></script>
+<style media="screen">
+	.clock-block {
+        position: relative;
+        padding-top: 100px;
+        max-width: 800px;
+        margin: auto;
+    }
+	#clock-container {
+    overflow: hidden;
+    background: transparent;
+    }
+    #clock-container img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+	#clock-container, .hand {
+        position: absolute;
+        top:0;
+        left: 0;
+        pointer-events: none;
+        transition: all 0.5s;
+        transition-timing-function: cubic-bezier(0.1, 2.7, 0.58, 1);
+    }
+    #clock-face {
+        position: relative;
+        width: 100%;
+        max-width: 768px;
+        height: 100%;
+        max-height: 768px;
+        overflow: hidden;
+    }
+    #controls{
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        background-color: #E8E8E8;
+        padding-bottom: 15px
+    }
+    .el-dropdown{
+        margin: 18px;
+        border: black solid;
+        width: 70px;
+        border-radius: 5px;
+        padding: 10px;
+    }
+    .el-date-editor input{
+        border: black solid;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .el-date-editor {
+        margin-bottom: 20px;
+    }
+
+</style>
+
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+<div id="app">
+	<section id=controls>
+		<h1>Vue Clock</h1>
+		<el-dropdown @command="clockFaceDropdown" v-model="faceSelected">
+			<span class="el-dropdown-link">
+				ClockFace<i class="el-icon-arrow-down el-icon--right"></i>
+			</span>
+			<el-dropdown-menu slot="dropdown">
+				<el-dropdown-item command="0">Second segments, no numbers</el-dropdown-item>
+				<el-dropdown-item command="1">Second segments, with numbers</el-dropdown-item>
+				<el-dropdown-item command="2">Second segments, roman numerals</el-dropdown-item>
+				<el-dropdown-item command="3" disabled>No second segments, no numbers</el-dropdown-item>
+				<el-dropdown-item command="4" divided>No second segments, with numbers</el-dropdown-item>
+				<el-dropdown-item command="5" divided>No Second segments, roman numerals</el-dropdown-item>
+			</el-dropdown-menu>
+		</el-dropdown>
+
+		<form id="time-form">
+			<el-time-picker v-model="timeSelected" :picker-options="{
+      selectableRange: '00:00:00 - 23:59:59'
+  }" placeholder="Pick A Time">
+			</el-time-picker>
+			<!-- <input type="submit"> Submit -->
+			<el-button type="primary" @click="eventTrigger(timeSelected)">Success</el-button>
+		</form>
+
+		<el-checkbox label="Toggle Second Hand" v-model="checked" @change="secondHandToggler()"></el-checkbox>
+
+	</section>
+	<section class="clock-block">
+		<div id="clock-container" :aria-label="ariaTag">
+			<img id="clock-face" :src="selectedFace">
+			<img class="hand" :src="hourHand" v-bind:style="{transform: `rotate(${hourHandRotation})`}">
+			<img class="hand" :src="minHand" :style="{ transform: `rotate(${minHandRotation})` }">
+			<img class="hand" v-if="toggleSecondHand" :src="secHand" :style="{ transform: `rotate(${ secondHandRotation})` }">
+		</div>
+	</section>
+
+</div>
+
+<script>
+	let app = new Vue({
+		el: '#app',
+		data: {
+			selectedFace: '',
+			clockFaces: ["https://res.cloudinary.com/chris-del/image/upload/v1540245968/Clock/clock_clockface6.png", "https://res.cloudinary.com/chris-del/image/upload/v1540245967/Clock/clock_clockface2.png",
+				"https://res.cloudinary.com/chris-del/image/upload/v1540245967/Clock/clock_clockface4.png", "https://res.cloudinary.com/chris-del/image/upload/v1540245967/Clock/clock_clockface5.png",
+				"https://res.cloudinary.com/chris-del/image/upload/v1540245967/Clock/clock_clockface.png", "https://res.cloudinary.com/chris-del/image/upload/v1540245967/Clock/clock_clockface3.png"
+			],
+			hourHand: "https://res.cloudinary.com/chris-del/image/upload/v1540245968/Clock/regular_hour_hand.png",
+			minHand: "https://res.cloudinary.com/chris-del/image/upload/v1540245968/Clock/regular_minute_hand.png",
+			secHand: "https://res.cloudinary.com/chris-del/image/upload/v1540245968/Clock/regular_second_hand.png",
+			hourHandRotation: `0`,
+			minHandRotation: `0`,
+			secondHandRotation: `0`,
+			mins: 0,
+			secs: 0,
+			hours: 0,
+			faceSelected: '',
+			timeSelected: new Date(new Date()),
+			value1: '',
+			toggleSecondHand: true,
+			checked: true,
+			lastTimeSet: [12, 0, 0],
+			interval: 0
+		},
+		created: function() {
+			// set to 12 on start
+			this.timeToDegrees("12", "hour", true)
+			this.timeToDegrees("0", "min", true)
+			this.timeToDegrees("0", "sec", true)
+
+		},
+		mounted: function() {
+			// add default face
+			(face => {
+				this.selectedFace = this.clockFaces[4]
+			})();
+			// set to current time
+			let that = this
+			this.interval = setInterval(function() {
+				that.setOriginalTime(new Date())
+			}, 1000)
+		},
+		computed: {
+			// dynamic aria tag computer
+			ariaTag: function() {
+				if (this.toggleSecondHand) {
+					return `A clock with the hour hand set to ${
+			  this.lastTimeSet[0]
+			}, the minute hand set to ${
+			  this.lastTimeSet[1]
+          }, and the seconds hand set to ${this.lastTimeSet[2]}.`;
+				} else {
+					return `A clock with the hour hand set to ${
+			  this.lastTimeSet[0]
+          } and the minute hand set to ${this.lastTimeSet[1]}.`;
+				}
+			}
+		},
+		methods: {
+			secondHandToggler: function() {
+				if (!this.checked) {
+					this.toggleSecondHand = false
+				} else {
+					this.toggleSecondHand = true
+				}
+			},
+			// get hour hand drift based on mins /
+			hourDrift: function(mins) {
+				//5 mins = 30 degs
+				//30/12mins = 2.5 degrees hour hand for 5 mins
+				// take mins, round down to nearest 5
+				mins = Math.floor(mins / 5) * 5;
+				// get units of 5
+				let fives = mins / 5;
+				// get 2.5 deg drift for each unit of 5
+				let drift = fives * 2.5;
+				return drift;
+			},
+			clockFaceDropdown(command) {
+				// console.log(this.faceSelected)
+				let selectedIndex = parseInt(command)
+				// determines what the selected face is form dropdown- sets it
+				this.selectedFace = this.clockFaces[selectedIndex]
+			},
+			timeExtractFromDate: function(date) {
+				let hour = date.getHours()
+				let min = date.getMinutes()
+				let sec = date.getSeconds()
+				return [hour, min, sec]
+			},
+			setOriginalTime: function(input) {
+				let result = this.timeExtractFromDate(input)
+				let hour = result[0]
+				let min = result[1]
+				let sec = result[2]
+
+				this.timeToDegrees(hour, "hour");
+				this.timeToDegrees(min, "min");
+				this.timeToDegrees(sec, "sec");
+				this.lastTimeSet = [hour, min, sec]
+
+				console.log(this.lastTimeSet)
+
+
+			},
+			setEventTime: function(input) {
+				clearInterval(this.interval)
+				let result = this.timeExtractFromDate(input)
+				let hour = result[0]
+				let min = result[1]
+				let sec = result[2]
+
+				this.timeToDegrees(hour, "hour");
+				// this.timeToDegrees(min, "min");
+				// this.timeToDegrees(sec, "sec");
+
+				this.lastTimeSet = [hour, min, sec]
+
+			},
+			eventTrigger: function(input) {
+				console.log(input)
+				let that = this
+				setInterval(function() {
+					that.setEventTime(input)
+				}, 1000)
+			},
+			timeToDegrees: function(time, type, onLoad) {
+				switch (type) {
+					case "hour":
+						// turn 30 degrees an hour
+						time = parseInt(time) * 30;
+						// toggle drift on/off
+						if (!onLoad) {
+							let drift = this.hourDrift(this.timeSelected.getMinutes())
+							console.log('drift', drift)
+							time = drift + time;
+							return (this.hourHandRotation = `${time}deg`);
+						} else {
+							return (this.hourHandRotation = `${time}deg`);
+						}
+						// each min gets 6 degrees 360/60
+					case "min":
+						time = parseInt(time) * 6;
+						return (this.minHandRotation = `${time}deg`);
+						// each sec gets 6 degrees 360/60
+					case "sec":
+						time = parseInt(time) * 6;
+						return (this.secondHandRotation = `${time}deg`);
+				}
+			}
+		}
+	})
+</script>
