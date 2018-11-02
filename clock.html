@@ -235,9 +235,9 @@
 			// takes input full dateInput
 			// extract each part
 			// clears interval
-			// sets new date
+			// sets new date on
 			// exports new date
-			updater: function(dateInput) {
+			updateOneSecond: function(dateInput) {
 				let result = this.timeExtractFromDate(dateInput)
 				console.log('result', result)
 				let year = result[0]
@@ -248,10 +248,6 @@
 				let sec = result[5]
 				let newDate
 
-				// clear other intervals
-				if (this.interval !== 0) {
-					clearInterval(this.checkInterval)
-				}
 
 				function logic() {
 					console.log('call logic')
@@ -314,87 +310,27 @@
 				return newDate
 			},
 			//takes full date
-			// calls updater -
+			// calls updateOneSecond -
 			eventTrigger: function(input) {
-				// let updated = this.updater(input)
-				// console.log('before', input)
-				// console.log('after', updated)
-				// console.log('input', this.timeExtractFromDate(input))
-				// extract from set input time
-				// let result = this.timeExtractFromDate(input)
-				// let year = result[0]
-				// let month = result[1]
-				// let day = result[2]
-				// let hour = result[3]
-				// let min = result[4]
-				// let sec = result[5]
-				//
-				let that = this
-				// // clear other intervals
-				// if (this.interval !== 0) {
-				// 	clearInterval(this.checkInterval)
-				// }
-				// let updater = function() {
-				// 	sec = sec + 1
-				// 	if (sec > 60) {
-				// 		sec = 1
-				// 		min = min + 1
-				// 		console.log('increment min', min)
-				// 	}
-				// 	if (min > 60) {
-				// 		min = 0
-				// 		hour = hour + 1
-				// 		console.log('increment hour', hour)
-				// 	}
-				// 	if (hour > 24) {
-				// 		hour = 0
-				// 		day = day + 1
-				// 		console.log('increment day', day)
-				//
-				// 	}
-				// 	// 31 day mos
-				// 	if (month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month === 10 || month || 12) {
-				// 		console.log('inside month', month)
-				//
-				// 		if (day > 31) {
-				// 			day = 1
-				// 			month = month + 1
-				// 			console.log('increment month 31', month)
-				//
-				// 		}
-				// 	} else if (month !== 2) {
-				// 		if (day > 30) {
-				// 			day = 1
-				// 			month = month + 1
-				// 			console.log('increment month 30', month)
-				//
-				// 		}
-				// 		// feb?
-				// 	} else {
-				// 		if (day > 28) {
-				// 			day = 1
-				// 			month = month + 1
-				// 			console.log('increment month FEB', month)
-				//
-				// 		}
-				// 	}
-				// 	console.log('year', year)
-				// 	console.log('month', month)
-				// 	console.log('day', day)
-				// 	console.log('sec', sec)
-				// 	console.log('min', min)
-				// 	console.log('hour', hour)
-				// 	// console.log(new Date(year, month, day, hour, min, sec))
-				// 	// create new date one sec later
-				// 	let newDate = new Date(year, month, day, hour, min, sec)
-				// 	// make new time with updated Date
-				// 	that.setEventTime(newDate)
-				// }
+				// clear other intervals on button click
+				if (this.checkInterval !== 0) {
+					clearInterval(this.checkInterval)
+				}
+				let counter = 0
 
-				setInterval(function() {
-					console.log('INPUT', input)
-					let updated = that.updater(input)
-					that.setEventTime(updated)
+				let that = this
+				let updated
+				this.checkInterval = setInterval(function() {
+					// if first call use input
+					if (counter === 0) {
+						updated = that.updateOneSecond(input)
+						that.setEventTime(updated)
+						// else use updated date
+					} else {
+						updated = that.updateOneSecond(updated)
+						that.setEventTime(updated)
+					}
+					counter++
 				}, 1000)
 			},
 			timeToDegrees: function(time, type, onLoad) {
