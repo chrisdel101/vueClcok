@@ -254,6 +254,7 @@
 				}
 
 				function logic() {
+					console.log('call logic')
 					sec = sec + 1
 
 					if (sec > 60) {
@@ -315,7 +316,7 @@
 			//takes full date
 			// calls updater -
 			eventTrigger: function(input) {
-				let updated = this.updater(input)
+				// let updated = this.updater(input)
 				// console.log('before', input)
 				// console.log('after', updated)
 				// console.log('input', this.timeExtractFromDate(input))
@@ -391,6 +392,8 @@
 				// }
 
 				setInterval(function() {
+					console.log('INPUT', input)
+					let updated = that.updater(input)
 					that.setEventTime(updated)
 				}, 1000)
 			},
