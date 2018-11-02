@@ -22,6 +22,9 @@
         top:0;
         left: 0;
         pointer-events: none;
+        transition: none;
+    }
+    .timing-function {
         transition: all 0.5s;
         transition-timing-function: cubic-bezier(0.1, 2.7, 0.58, 1);
     }
@@ -94,7 +97,8 @@
 			<img id="clock-face" :src="selectedFace">
 			<img class="hand" :src="hourHand" v-bind:style="{transform: `rotate(${hourHandRotation})`}">
 			<img class="hand" :src="minHand" :style="{ transform: `rotate(${minHandRotation})` }">
-			<img class="hand" v-if="toggleSecondHand" :src="secHand" :style="{ transform: `rotate(${ secondHandRotation})` }">
+			<img class="hand" :class="{ 'timing-function': notZero }" v-if="toggleSecondHand" :src="secHand" :style="{ transform: `rotate(${ secondHandRotation})` }">
+			{{toggleTimingFunc}}
 		</div>
 	</section>
 
@@ -104,6 +108,7 @@
 	let app = new Vue({
 		el: '#app',
 		data: {
+			notZero: '',
 			selectedFace: '',
 			clockFaces: ["https://res.cloudinary.com/chris-del/image/upload/v1540245968/Clock/clock_clockface6.png", "https://res.cloudinary.com/chris-del/image/upload/v1540245967/Clock/clock_clockface2.png",
 				"https://res.cloudinary.com/chris-del/image/upload/v1540245967/Clock/clock_clockface4.png", "https://res.cloudinary.com/chris-del/image/upload/v1540245967/Clock/clock_clockface5.png",
@@ -139,10 +144,10 @@
 				this.selectedFace = this.clockFaces[4]
 			})();
 			// set to current time
-			// let that = this
-			// this.interval = setInterval(function() {
-			// 	that.setOriginalTime(new Date())
-			// }, 1000)
+			let that = this
+			this.checkInterval = setInterval(function() {
+				that.setOriginalTime(new Date())
+			}, 1000)
 		},
 		computed: {
 			// dynamic aria tag computer
@@ -157,6 +162,17 @@
 					return `A clock with the hour hand set to ${
 			  this.lastTimeSet[0]
           } and the minute hand set to ${this.lastTimeSet[1]}.`;
+				}
+			},
+			toggleTimingFunc: function() {
+
+				let seconds = this.lastTimeSet[2]
+				if (seconds === 0) {
+					console.log('zero')
+					this.notZero = false
+				} else {
+					console.log('not zero')
+					this.notZero = true
 				}
 			}
 		},
@@ -253,8 +269,9 @@
 					console.log('call logic')
 					sec = sec + 1
 
-					if (sec > 60) {
-						sec = 1
+
+					if (sec > 59) {
+						sec = 0
 						min = min + 1
 						console.log('increment min', min)
 					}
@@ -295,12 +312,14 @@
 
 						}
 					}
-					console.log('year', year)
-					console.log('month', month)
-					console.log('day', day)
+					// console.log('year', year)
+					// console.log('month', month)
+					// console.log('day', day)
 					console.log('sec', sec)
-					console.log('min', min)
-					console.log('hour', hour)
+					// console.log('min', min)
+					// console.log('hour', hour)
+
+
 					// console.log(new Date(year, month, day, hour, min, sec))
 					// create new date one sec later
 					newDate = new Date(year, month, day, hour, min, sec)
@@ -311,7 +330,13 @@
 			},
 			//takes full date
 			// calls updateOneSecond -
+
 			eventTrigger: function(input) {
+				console.log('TRIGGER')
+				// let seconds = input.getSeconds()
+				// console.log('seconds', seconds)
+
+				// console.log(this.notZero)
 				// clear other intervals on button click
 				if (this.checkInterval !== 0) {
 					clearInterval(this.checkInterval)
@@ -321,14 +346,17 @@
 				let that = this
 				let updated
 				this.checkInterval = setInterval(function() {
+
 					// if first call use input
 					if (counter === 0) {
 						updated = that.updateOneSecond(input)
 						that.setEventTime(updated)
 						// else use updated date
 					} else {
+
 						updated = that.updateOneSecond(updated)
 						that.setEventTime(updated)
+
 					}
 					counter++
 				}, 1000)
