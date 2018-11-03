@@ -58,6 +58,9 @@
     .el-date-editor {
         margin-bottom: 20px;
     }
+    .el-checkbox {
+        margin-bottom: 20px;
+    }
 
 </style>
 
@@ -68,29 +71,33 @@
 		<h1>Vue Clock</h1>
 		<el-dropdown @command="clockFaceDropdown" v-model="faceSelected">
 			<span class="el-dropdown-link">
-				ClockFace<i class="el-icon-arrow-down el-icon--right"></i>
+				ClockFace
+				<i class="el-icon-arrow-down el-icon--right"></i>
 			</span>
 			<el-dropdown-menu slot="dropdown">
 				<el-dropdown-item command="0">Second segments, no numbers</el-dropdown-item>
 				<el-dropdown-item command="1">Second segments, with numbers</el-dropdown-item>
 				<el-dropdown-item command="2">Second segments, roman numerals</el-dropdown-item>
-				<el-dropdown-item command="3" disabled>No second segments, no numbers</el-dropdown-item>
+				<el-dropdown-item command="3">No second segments, no numbers</el-dropdown-item>
 				<el-dropdown-item command="4" divided>No second segments, with numbers</el-dropdown-item>
 				<el-dropdown-item command="5" divided>No Second segments, roman numerals</el-dropdown-item>
 			</el-dropdown-menu>
 		</el-dropdown>
 
 		<form id="time-form">
-			<el-time-picker v-model="timeSelected" :picker-options="{
-      selectableRange: '00:00:00 - 23:59:59'
-  }" placeholder="Pick A Time">
+			<el-time-picker v-model="timeSelected" ref="date-picker" :picker-options="{
+                selectableRange: '00:00:00 - 23:59:59'
+            }" placeholder="Pick A Time">
 			</el-time-picker>
-			<!-- <input type="submit"> Submit -->
-			<el-button type="primary" @click="eventTrigger(timeSelected)">Success</el-button>
+
+			<el-button type="primary" @click="handleSetClick(timeSelected)">Set Time
+			</el-button>
 		</form>
 
 		<el-checkbox label="Toggle Second Hand" v-model="checked" @change="secondHandToggler()"></el-checkbox>
 
+		<el-button type="warning" @click="handleResetClick()">Reset to Current
+		</el-button>
 	</section>
 	<section class="clock-block">
 		<div id="clock-container" :aria-label="ariaTag">
@@ -108,6 +115,7 @@
 	let app = new Vue({
 		el: '#app',
 		data: {
+			pickerValue: '',
 			notZero: '',
 			selectedFace: '',
 			clockFaces: ["https://res.cloudinary.com/chris-del/image/upload/v1540245968/Clock/clock_clockface6.png", "https://res.cloudinary.com/chris-del/image/upload/v1540245967/Clock/clock_clockface2.png",
@@ -133,9 +141,9 @@
 		},
 		created: function() {
 			// set to 12 on start
-			this.timeToDegrees("12", "hour", true)
-			this.timeToDegrees("0", "min", true)
-			this.timeToDegrees("0", "sec", true)
+			this.timeToDegrees(12, "hour", true)
+			this.timeToDegrees(0, "min", true)
+			this.timeToDegrees(0, "sec", true)
 
 		},
 		mounted: function() {
@@ -144,10 +152,7 @@
 				this.selectedFace = this.clockFaces[4]
 			})();
 			// set to current time
-			let that = this
-			this.checkInterval = setInterval(function() {
-				that.setOriginalTime(new Date())
-			}, 1000)
+			this.checkInterval = this.toCurrentTime(1000)
 		},
 		computed: {
 			// dynamic aria tag computer
@@ -164,19 +169,25 @@
           } and the minute hand set to ${this.lastTimeSet[1]}.`;
 				}
 			},
+			// turn off timing func on zero second
 			toggleTimingFunc: function() {
-
+				// get seconds
 				let seconds = this.lastTimeSet[2]
 				if (seconds === 0) {
-					console.log('zero')
 					this.notZero = false
 				} else {
-					console.log('not zero')
 					this.notZero = true
 				}
 			}
 		},
 		methods: {
+			toCurrentTime: function(interval) {
+				let that = this
+				return setInterval(function() {
+					that.setClock(new Date())
+					this.lastTimeSet
+				}, interval)
+			},
 			secondHandToggler: function() {
 				if (!this.checked) {
 					this.toggleSecondHand = false
@@ -197,11 +208,11 @@
 				return drift;
 			},
 			clockFaceDropdown(command) {
-				// console.log(this.faceSelected)
 				let selectedIndex = parseInt(command)
 				// determines what the selected face is form dropdown- sets it
 				this.selectedFace = this.clockFaces[selectedIndex]
 			},
+			// extract parts of date
 			timeExtractFromDate: function(date) {
 				let hour = date.getHours()
 				let min = date.getMinutes()
@@ -211,36 +222,15 @@
 				let year = date.getFullYear()
 				return [year, month, day, hour, min, sec]
 			},
-			setOriginalTime: function(input) {
-				let result = this.timeExtractFromDate(input)
-				let year = result[0]
-				let month = result[1]
-				let day = result[2]
-				let hour = result[3]
-				let min = result[4]
-				let sec = result[5]
-
-				this.timeToDegrees(hour, "hour");
-				this.timeToDegrees(min, "min");
-				this.timeToDegrees(sec, "sec");
-				this.lastTimeSet = [hour, min, sec]
-
-				console.log(this.lastTimeSet)
-
-
-			},
 			// takes full date
 			//extacts parts
 			//calls timeToDegrees
-			setEventTime: function(input) {
-				// clearInterval(this.interval)
+			setClock: function(input) {
 				let result = this.timeExtractFromDate(input)
 				let hour = result[3]
 				let min = result[4]
 				let sec = result[5]
-				// console.log(hour)
-				// console.log(min)
-				// console.log(sec)
+
 				this.timeToDegrees(hour, "hour");
 				this.timeToDegrees(min, "min");
 				this.timeToDegrees(sec, "sec");
@@ -264,12 +254,8 @@
 				let sec = result[5]
 				let newDate
 
-
 				function logic() {
-					console.log('call logic')
 					sec = sec + 1
-
-
 					if (sec > 59) {
 						sec = 0
 						min = min + 1
@@ -301,65 +287,87 @@
 							day = 1
 							month = month + 1
 							console.log('increment month 30', month)
-
 						}
-						// feb?
+						// feb
 					} else {
 						if (day > 28) {
 							day = 1
 							month = month + 1
 							console.log('increment month FEB', month)
-
 						}
 					}
-					// console.log('year', year)
-					// console.log('month', month)
-					// console.log('day', day)
-					console.log('sec', sec)
-					// console.log('min', min)
-					// console.log('hour', hour)
-
-
-					// console.log(new Date(year, month, day, hour, min, sec))
 					// create new date one sec later
 					newDate = new Date(year, month, day, hour, min, sec)
-					// make new time with updated Date
 				}
 				logic()
 				return newDate
 			},
 			//takes full date
 			// calls updateOneSecond -
-
-			eventTrigger: function(input) {
-				console.log('TRIGGER')
-				// let seconds = input.getSeconds()
-				// console.log('seconds', seconds)
-
-				// console.log(this.notZero)
+			makeInterval: function(inputDate) {
 				// clear other intervals on button click
 				if (this.checkInterval !== 0) {
 					clearInterval(this.checkInterval)
+					console.log('interval', this.checkInterval)
 				}
-				let counter = 0
-
+				// determine if first call or not
+				let first = true
+				// scoping vars
 				let that = this
 				let updated
 				this.checkInterval = setInterval(function() {
-
-					// if first call use input
-					if (counter === 0) {
-						updated = that.updateOneSecond(input)
-						that.setEventTime(updated)
-						// else use updated date
+					// if first call use oringal inputDate
+					if (first) {
+						updated = that.updateOneSecond(inputDate)
+						that.setClock(updated)
+						first = false
+						// else use updated date as input
 					} else {
-
 						updated = that.updateOneSecond(updated)
-						that.setEventTime(updated)
-
+						that.setClock(updated)
 					}
-					counter++
 				}, 1000)
+			},
+			extactTimeFromDate: function() {
+				// get the time portion from the new date
+				let re = /([^\s]+)/
+				// convert to timeStrig
+				let newTime = new Date().toTimeString()
+				// get only the time part
+				newTime = newTime.match(re)[0]
+				// strip out colons
+				newTime = newTime.replace(/:/g, " ")
+				return newTime
+			},
+			setPickerDisplay: function() {
+				let pickerRefs = this.$refs['date-picker']
+				let inputsList = pickerRefs.$el.childNodes
+				let input = inputsList[1].value
+				let time = this.lastTimeSet.join(' ')
+
+				// if (time === "12 0 0" || time === ) {
+				//
+				// 	alert("Cannot reset. Already on current time.")
+				// 	return
+				// }
+				this.pickerValue = "11:00:00"
+				this.timeSelected = new Date()
+
+
+
+			},
+			handleSetClick: function(input) {
+				this.makeInterval(input)
+			},
+			handleResetClick: function() {
+				if (this.checkInterval !== 0) {
+					clearInterval(this.checkInterval)
+					console.log('interval', this.checkInterval)
+				}
+				this.checkInterval = this.toCurrentTime(1000)
+				this.timeSelected = new Date()
+
+
 			},
 			timeToDegrees: function(time, type, onLoad) {
 				switch (type) {
@@ -368,8 +376,7 @@
 						time = parseInt(time) * 30;
 						// toggle drift on/off
 						if (!onLoad) {
-							let drift = this.hourDrift(this.timeSelected.getMinutes())
-							console.log('drift', drift)
+							let drift = this.hourDrift(this.lastTimeSet[1])
 							time = drift + time;
 							return (this.hourHandRotation = `${time}deg`);
 						} else {
