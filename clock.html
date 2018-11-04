@@ -61,6 +61,9 @@
     .triggers .el-button {
         margin-bottom: 10px;
     }
+    .triggers .el-button span {
+        pointer-events: none;
+    }
     .triggers .el-button:nth-of-type(2) {
         margin-bottom: 0
     }
@@ -75,6 +78,7 @@
     .el-button+.el-button {
         margin-left: 0;
     }
+
 
 </style>
 
@@ -99,23 +103,21 @@
 		</el-dropdown>
 
 		<form id="time-form">
-			<el-time-picker v-model="timeSelected" ref="date-picker" :picker-options="{
-                selectableRange: '00:00:00 - 23:59:59'
-            }" placeholder="Pick A Time">
+			<el-time-picker v-model="timeSelected" ref="date-picker" @click.native="changeIcons()" :picker-options=" { selectableRange: '00:00:00 - 23:59:59' }" placeholder="Pick A Time">
 			</el-time-picker>
 
 			<el-button type="primary" @click="handleSetClick(timeSelected)">Set Time
 			</el-button>
 		</form>
 		<div class="triggers">
-			<el-checkbox class="trigger" label="Keep clock ticking" v-model="checked" @change="secondHandToggler()"></el-checkbox>
+			<el-checkbox class="trigger" label="Toggle Second Hand" v-model="secondHandModel" @change="secondHandToggler($event)"></el-checkbox>
 
-			<el-checkbox class="trigger" label="Toggle Second Hand" v-model="checked" @change=""></el-checkbox>
+			<el-checkbox class="trigger" label="Keep clock ticking" v-model="tickerModel" @change="tickerToggler($event)"></el-checkbox>
 
 			<el-button class="trigger" type="warning" @click="handleResetClick()">Reset to Current
 			</el-button>
 
-			<el-button class="trigger" type="danger" @click="handleResetClick()">Stop Clock
+			<el-button class="trigger" type="danger" @click="tickerToggler($event)">Stop Clock
 			</el-button>
 		</div>
 	</section>
@@ -155,7 +157,8 @@
 			timeSelected: new Date(new Date()),
 			value1: '',
 			toggleSecondHand: true,
-			checked: true,
+			tickerModel: true,
+			secondHandModel: true,
 			lastTimeSet: [12, 0, 0],
 			checkInterval: 0
 		},
@@ -171,8 +174,10 @@
 			(face => {
 				this.selectedFace = this.clockFaces[4]
 			})();
-			// set to current time
-			this.checkInterval = this.toCurrentTime(1000)
+			(time => {
+				// set to current time
+				this.checkInterval = this.toCurrentTime(1000)
+			})();
 		},
 		computed: {
 			// dynamic aria tag computer
@@ -201,19 +206,51 @@
 			}
 		},
 		methods: {
+			changeIcons: function() {
+				console.log(this.$refs)
+				// regular JS to override Chinese chars
+				document.querySelectorAll('.el-time-panel__btn')[0].textContent = 'Cancel'
+				document.querySelectorAll('.el-time-panel__btn')[1].textContent = 'Set'
+			},
 			toCurrentTime: function(interval) {
 				let that = this
 				return setInterval(function() {
 					that.setClock(new Date())
-					this.lastTimeSet
 				}, interval)
 			},
 			secondHandToggler: function() {
-				if (!this.checked) {
+				if (!this.secondHandModel) {
 					this.toggleSecondHand = false
 				} else {
 					this.toggleSecondHand = true
 				}
+			},
+			// handle stoping and starting
+			tickerToggler: function(e) {
+				// if running, stop
+				if (this.checkInterval) {
+					clearInterval(this.checkInterval)
+					this.checkInterval = 0
+					// check if undefined b4 running
+					if (e.target) {
+						// if button click, also uncheck box too
+						if (e.target.nodeName === 'BUTTON') {
+							// this.tickerModel = false
+							this.handleTickerModel()
+							console.log(this.tickerModel)
+						}
+					}
+					// if stopped, make it run agin
+				} else {
+					// set to resume from lastTimeSet
+					let newDate = this.lastTimeToDate()
+					this.makeInterval(newDate)
+				}
+			},
+			// check and uncheck box as clock starts and stops
+			handleTickerModel: function() {
+				this.tickerModel = !this.tickerModel
+				return this.tickerModel
 			},
 			// get hour hand drift based on mins /
 			hourDrift: function(mins) {
@@ -322,6 +359,20 @@
 				logic()
 				return newDate
 			},
+			// put lastTimeSet into current date - to this pass into setTime on checkbox trigger
+			lastTimeToDate: function() {
+				let date = new Date()
+				let year = date.getFullYear()
+				let month = date.getMonth()
+				let day = date.getDay()
+				let hour = this.lastTimeSet[0]
+				let min = this.lastTimeSet[1]
+				let sec = this.lastTimeSet[2]
+
+				let newDate = new Date(year, month, day, hour, min, sec)
+
+				return newDate
+			},
 			//takes full date
 			// calls updateOneSecond -
 			makeInterval: function(inputDate) {
@@ -361,6 +412,7 @@
 			},
 			handleSetClick: function(input) {
 				this.makeInterval(input)
+				this.handleTickerModel()
 			},
 			handleResetClick: function() {
 				if (this.checkInterval !== 0) {
@@ -368,6 +420,7 @@
 				}
 				this.checkInterval = this.toCurrentTime(1000)
 				this.timeSelected = new Date()
+				this.handleTickerModel()
 			},
 			timeToDegrees: function(time, type, onLoad) {
 				switch (type) {
