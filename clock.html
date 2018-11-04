@@ -55,11 +55,25 @@
         border-radius: 5px;
         margin-bottom: 20px;
     }
-    .el-date-editor {
-        margin-bottom: 20px;
-    }
     .el-checkbox {
-        margin-bottom: 20px;
+        margin-bottom: 10px;
+    }
+    .triggers .el-button {
+        margin-bottom: 10px;
+    }
+    .triggers .el-button:nth-of-type(2) {
+        margin-bottom: 0
+    }
+    .triggers {
+        display: flex;
+        flex-direction: column;
+    }
+    /* overwrite lib styles */
+    .el-checkbox+.el-checkbox{
+        margin-left: 0;
+    }
+    .el-button+.el-button {
+        margin-left: 0;
     }
 
 </style>
@@ -79,8 +93,8 @@
 				<el-dropdown-item command="1">Second segments, with numbers</el-dropdown-item>
 				<el-dropdown-item command="2">Second segments, roman numerals</el-dropdown-item>
 				<el-dropdown-item command="3">No second segments, no numbers</el-dropdown-item>
-				<el-dropdown-item command="4" divided>No second segments, with numbers</el-dropdown-item>
-				<el-dropdown-item command="5" divided>No Second segments, roman numerals</el-dropdown-item>
+				<el-dropdown-item command="4">No second segments, with numbers</el-dropdown-item>
+				<el-dropdown-item command="5">No Second segments, roman numerals</el-dropdown-item>
 			</el-dropdown-menu>
 		</el-dropdown>
 
@@ -93,11 +107,17 @@
 			<el-button type="primary" @click="handleSetClick(timeSelected)">Set Time
 			</el-button>
 		</form>
+		<div class="triggers">
+			<el-checkbox class="trigger" label="Keep clock ticking" v-model="checked" @change="secondHandToggler()"></el-checkbox>
 
-		<el-checkbox label="Toggle Second Hand" v-model="checked" @change="secondHandToggler()"></el-checkbox>
+			<el-checkbox class="trigger" label="Toggle Second Hand" v-model="checked" @change=""></el-checkbox>
 
-		<el-button type="warning" @click="handleResetClick()">Reset to Current
-		</el-button>
+			<el-button class="trigger" type="warning" @click="handleResetClick()">Reset to Current
+			</el-button>
+
+			<el-button class="trigger" type="danger" @click="handleResetClick()">Stop Clock
+			</el-button>
+		</div>
 	</section>
 	<section class="clock-block">
 		<div id="clock-container" :aria-label="ariaTag">
@@ -339,35 +359,15 @@
 				newTime = newTime.replace(/:/g, " ")
 				return newTime
 			},
-			setPickerDisplay: function() {
-				let pickerRefs = this.$refs['date-picker']
-				let inputsList = pickerRefs.$el.childNodes
-				let input = inputsList[1].value
-				let time = this.lastTimeSet.join(' ')
-
-				// if (time === "12 0 0" || time === ) {
-				//
-				// 	alert("Cannot reset. Already on current time.")
-				// 	return
-				// }
-				this.pickerValue = "11:00:00"
-				this.timeSelected = new Date()
-
-
-
-			},
 			handleSetClick: function(input) {
 				this.makeInterval(input)
 			},
 			handleResetClick: function() {
 				if (this.checkInterval !== 0) {
 					clearInterval(this.checkInterval)
-					console.log('interval', this.checkInterval)
 				}
 				this.checkInterval = this.toCurrentTime(1000)
 				this.timeSelected = new Date()
-
-
 			},
 			timeToDegrees: function(time, type, onLoad) {
 				switch (type) {
