@@ -80,6 +80,10 @@
         margin-left: 0;
     }
 
+    canvas {
+        width: 400px;
+    }
+
 /* MODAL STYLES https://vuejs.org/v2/examples/modal.html */
     .modal-mask {
     position: fixed;
@@ -184,10 +188,11 @@
 
 			<el-button class="trigger" type="primary" @click="takeScreenShot($event)">ScreenShot
 			</el-button>
+
 		</div>
 	</section>
 	<section class="clock-block">
-		<div id="clock-container" :aria-label="ariaTag">
+		<div id="clock-container" :aria-label="ariaTag" ref="clock-container">
 			<img id="clock-face" :src="selectedFace">
 			<img class="hand" :src="hourHand" v-bind:style="{transform: `rotate(${hourHandRotation})`}">
 			<img class="hand" :src="minHand" :style="{ transform: `rotate(${minHandRotation})` }">
@@ -242,7 +247,7 @@
 		data: {
 			modalShow: false,
 			pickerValue: '',
-			notZero: '',
+			notZero: true,
 			selectedFace: '',
 			clockFaces: ["https://res.cloudinary.com/chris-del/image/upload/v1540245968/Clock/clock_clockface6.png", "https://res.cloudinary.com/chris-del/image/upload/v1540245967/Clock/clock_clockface2.png",
 				"https://res.cloudinary.com/chris-del/image/upload/v1540245967/Clock/clock_clockface4.png", "https://res.cloudinary.com/chris-del/image/upload/v1540245967/Clock/clock_clockface5.png",
@@ -314,23 +319,41 @@
 			closeModal: function() {
 				this.modalShow = false
 			},
+			stopTimingFunc: function() {
+				this.notZero = !this.notZero
+			},
 			takeScreenShot: function() {
-				// takeScreenShot: function() {
-				let modalBody = this.$refs.modal.$el.children[0].children[0].children[2]
-				// console.log(this.$refs)
+				// stop timing func
+				this.notZero = !this.notZero
+				// show modal
 				this.modalShow = true
 
-				let clock = document.querySelector('#clock-container')
-				let face = document.querySelector('#clock-face')
-				html2canvas(clock, {
-					backgroundColor: 'blue',
-					useCORS: true
-				}).then(function(canvas) {
-					modalBody.appendChild(canvas)
-				});
+				let modalBody = this.$refs.modal.$el.children[0].children[0].children[2]
+				let clock = this.$refs['clock-container']
 
+				this.$nextTick(function() {
+					html2canvas(clock, {
+						backgroundColor: 'blue',
+						useCORS: true,
+					}).then(function(canvas) {
+						let oldCanvas = document.querySelector('canvas')
+						if (oldCanvas) {
+							modalBody.removeChild(oldCanvas)
+
+						}
+
+						modalBody.appendChild(canvas)
+						canvas.style.width = '400px'
+						canvas.style.height = 'auto'
+					})
+				})
 
 			},
+			// takeScreenShot: function() {
+			// 	this.notZero = false
+			// 	console.log(this.notZero)
+			//
+			// },
 			changeIcons: function() {
 				console.log(this.$refs)
 				// regular JS to override Chinese chars
