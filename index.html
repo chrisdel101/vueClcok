@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
 <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<script src="https://use.fontawesome.com/8f6adc7e15.js"></script>
 <script type="text/javascript" src="https://unpkg.com/vue@2.5.10/dist/vue.js"></script>
 <script type="text/javascript" src="https://unpkg.com/html2canvas@1.0.0-alpha.12/dist/html2canvas.min.js"></script>
 <style media="screen">
@@ -83,6 +84,18 @@
     canvas {
         width: 400px;
     }
+    .download-icon{
+        position: relative;
+        top: 32px;
+        right: 35px;
+        color: black;
+    }
+    .download-icon:hover {
+        color: blue;
+    }
+    .download-icon:visited {
+        color: blue;
+    }
 
 /* MODAL STYLES https://vuejs.org/v2/examples/modal.html */
     .modal-mask {
@@ -103,7 +116,7 @@
     }
 
     .modal-container {
-      width: 300px;
+      width: 500px;
       margin: 0px auto;
       padding: 20px 30px;
       background-color: #fff;
@@ -120,6 +133,9 @@
 
     .modal-body {
       margin: 20px 0;
+      display: flex;
+      height: 400px;
+      justify-content: center;
     }
 
 
@@ -156,7 +172,6 @@
 		<el-dropdown @command="clockFaceDropdown" v-model="faceSelected">
 			<span class="el-dropdown-link">
 				ClockFace
-				<i class="el-icon-arrow-down el-icon--right"></i>
 			</span>
 			<el-dropdown-menu slot="dropdown">
 				<el-dropdown-item command="0">Second segments, no numbers</el-dropdown-item>
@@ -200,7 +215,7 @@
 			{{toggleTimingFunc}}
 		</div>
 	</section>
-	<modal v-show="modalShow" @close="closeModal()" ref="modal"></modal>
+	<modal v-show="modalShow" @close="closeModal()" @download="download()" ref="modal"></modal>
 
 </div>
 
@@ -208,9 +223,9 @@
 	Vue.component('modal', {
 		data: function() {
 			return {
-				header: 'header',
-				body: 'body',
-				footer: 'footer'
+				header: '',
+				download: `<a class="download-icon"><i class="fa fa-download fa-2x" aria-hidden="true"></i></a>`,
+				footer: ''
 			}
 		},
 		template: `<transition name="modal">
@@ -218,7 +233,7 @@
       <div class="modal-wrapper">
         <div class="modal-container">
         <button class="modal-default-button" @click="$emit('close')">
-          close
+        	<i class="fa fa-times" aria-hidden="true"></i>
         </button>
           <div class="modal-header">
             <slot name="header">
@@ -227,8 +242,9 @@
           </div>
 
           <div class="modal-body">
+              <div class="icon" v-html="download" @click="$emit('download')">
+              </div>
             <slot name="body">
-              {{body}}
             </slot>
           </div>
 
@@ -316,6 +332,16 @@
 			}
 		},
 		methods: {
+			download: function() {
+				// https://stackoverflow.com/questions/8126623/downloading-canvas-element-to-an-image
+				let downloadIcon = this.$refs.modal.$el.children[0].children[0].children[2].children[0].children[0]
+
+				let canvas = this.$refs.modal.$el.children[0].children[0].children[2].children[1]
+
+				var image = canvas.toDataURL("image/png")
+					.replace("image/png", "image/octet-stream")
+				downloadIcon.setAttribute("href", image);
+			},
 			closeModal: function() {
 				this.modalShow = false
 			},
@@ -327,8 +353,9 @@
 				this.notZero = !this.notZero
 				// show modal
 				this.modalShow = true
-
+				// modalBody
 				let modalBody = this.$refs.modal.$el.children[0].children[0].children[2]
+				// clock body
 				let clock = this.$refs['clock-container']
 
 				this.$nextTick(function() {
@@ -337,11 +364,12 @@
 						useCORS: true,
 					}).then(function(canvas) {
 						let oldCanvas = document.querySelector('canvas')
+						// if canvas is there, remove it
 						if (oldCanvas) {
 							modalBody.removeChild(oldCanvas)
 
 						}
-
+						// append new canvas
 						modalBody.appendChild(canvas)
 						canvas.style.width = '400px'
 						canvas.style.height = 'auto'
@@ -349,11 +377,6 @@
 				})
 
 			},
-			// takeScreenShot: function() {
-			// 	this.notZero = false
-			// 	console.log(this.notZero)
-			//
-			// },
 			changeIcons: function() {
 				console.log(this.$refs)
 				// regular JS to override Chinese chars
