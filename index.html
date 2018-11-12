@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@nytimes">
+<meta name="twitter:creator" content="@SarahMaslinNir">
+<meta name="twitter:title" content="Parade of Fans for Houston’s Funeral">
+<meta name="twitter:description" content="NEWARK - The guest list and parade of limousines with celebrities emerging from them seemed more suited to a red carpet event in Hollywood or New York than than a gritty stretch of Sussex Avenue near the former site of the James M. Baxter Terrace public housing project here.">
+<meta name="twitter:image" content="http://graphics8.nytimes.com/images/2012/02/19/us/19whitney-span/19whitney-span-articleLarge.jpg">
+
+
 
 <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 <script src="https://use.fontawesome.com/8f6adc7e15.js"></script>
@@ -84,7 +92,18 @@
     canvas {
         width: 400px;
     }
-    .download-icon{
+    .icons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        right: 38px;
+        top: 20px;
+    }
+    .icon {
+        margin: 10px 0;
+    }
+    /* .download-icon{
         position: relative;
         top: 32px;
         right: 35px;
@@ -95,7 +114,7 @@
     }
     .download-icon:visited {
         color: blue;
-    }
+    } */
 
 /* MODAL STYLES https://vuejs.org/v2/examples/modal.html */
     .modal-mask {
@@ -215,18 +234,28 @@
 			{{toggleTimingFunc}}
 		</div>
 	</section>
-	<modal v-show="modalShow" @close="closeModal()" @download="download()" ref="modal"></modal>
+	<modal v-show="modalShow" @close="closeModal()" @clicker="iconClick" ref="modal" :intent="intent"></modal>
 
 </div>
 
 <script>
-	Vue.component('modal', {
+	let modal = Vue.component('modal', {
 		data: function() {
 			return {
 				header: '',
-				download: `<a class="download-icon"><i class="fa fa-download fa-2x" aria-hidden="true"></i></a>`,
-				footer: ''
+				icons: [
+					"<a id='download-icon'><i class='fa fa-download fa-2x', aria-hidden='true'></i></a>",
+					`<a id="twitter-icon" v-bind:href="intent"><i class="fa fa-twitter fa-2x" aria-hidden="true"></i></a>`,
+					"<i class='fa fa-facebook-official fa-2x' aria-hidden='true'></i>",
+					"<i class='fa fa-reddit fa-2x' aria-hidden='true fa-2x'></i>",
+					"<i class='fa fa-cog fa-2x' aria-hidden='true'></i>"
+				],
+				footer: '',
 			}
+		},
+		props: ['intent'],
+		mounted: function() {
+			console.log(this.intent)
 		},
 		template: `<transition name="modal">
     <div class="modal-mask">
@@ -237,15 +266,16 @@
         </button>
           <div class="modal-header">
             <slot name="header">
+            {{intent}}
               {{header}}
             </slot>
           </div>
 
           <div class="modal-body">
-              <div class="icon" v-html="download" @click="$emit('download')">
-              </div>
-            <slot name="body">
-            </slot>
+            <div class="icons">
+            <div class="icon" v-for="icon in icons" v-html=icon @click="$emit('clicker', $event)">
+            </div>
+            </div>
           </div>
 
           <div class="modal-footer">
@@ -260,7 +290,11 @@
 	})
 	let app = new Vue({
 		el: '#app',
+		components: {
+			'modal': modal
+		},
 		data: {
+			intent: '',
 			modalShow: false,
 			pickerValue: '',
 			notZero: true,
@@ -332,9 +366,34 @@
 			}
 		},
 		methods: {
+			iconClick: function(e) {
+				if (e.target.className.includes('download')) {
+					this.download()
+				} else if (e.target.className.includes('twitter')) {
+					this.twitter()
+				} else if (e.target.className.includes('facebook')) {
+
+				} else if (e.target.className.includes('reddit')) {
+
+				} else if (e.target.className.includes('reddit')) {
+
+				} else if (e.target.className.includes('cog')) {
+
+				} else {
+					// error, icon not hooked up
+					alert('Error: that icon is invalid.')
+				}
+			},
+			twitter: function() {
+				// `https://twitter.com/intent/tweet/${image}`
+				let tweet = `https://twitter.com/intent/tweet/hello`
+				this.intent = tweet
+				console.log(this.intent)
+
+			},
 			download: function() {
 				// https://stackoverflow.com/questions/8126623/downloading-canvas-element-to-an-image
-				let downloadIcon = this.$refs.modal.$el.children[0].children[0].children[2].children[0].children[0]
+				let downloadIcon = this.$refs.modal.$el.children[0].children[0].children[2].children[0].children[0].children[0]
 
 				let canvas = this.$refs.modal.$el.children[0].children[0].children[2].children[1]
 
@@ -591,7 +650,9 @@
 				}
 				this.checkInterval = this.toCurrentTime(1000)
 				this.timeSelected = new Date()
-				this.handleTickerModel()
+				if (this.tickerModel === false) {
+					this.handleTickerModel()
+				}
 			},
 			timeToDegrees: function(time, type, onLoad) {
 				switch (type) {
