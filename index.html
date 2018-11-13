@@ -234,7 +234,7 @@
 			{{toggleTimingFunc}}
 		</div>
 	</section>
-	<modal v-show="modalShow" @close="closeModal()" @clicker="iconClick" ref="modal" :intent="intent"></modal>
+	<modal v-show="modalShow" @close="closeModal()" @clicker="iconClick" ref="modal" :intent="intent" :download-href="downloadHref" :twitter-href="twitterHref"></modal>
 
 </div>
 
@@ -243,19 +243,46 @@
 		data: function() {
 			return {
 				header: '',
-				icons: [
-					"<a id='download-icon'><i class='fa fa-download fa-2x', aria-hidden='true'></i></a>",
-					`<a id="twitter-icon" v-bind:href="intent"><i class="fa fa-twitter fa-2x" aria-hidden="true"></i></a>`,
-					"<i class='fa fa-facebook-official fa-2x' aria-hidden='true'></i>",
-					"<i class='fa fa-reddit fa-2x' aria-hidden='true fa-2x'></i>",
-					"<i class='fa fa-cog fa-2x' aria-hidden='true'></i>"
+				icons: [{
+						iconId: 'download',
+						faClass: 'fa-download',
+						href: '#'
+					},
+					{
+						iconId: 'twitter',
+						faClass: 'fa-twitter',
+						href: '#'
+					},
+					{
+						iconId: 'facebook',
+						faClass: 'fa-facebook',
+						href: '#'
+					},
+					{
+						iconId: 'reddit',
+						faClass: 'fa-reddit',
+						href: '#'
+					},
+					{
+						iconId: 'cog',
+						faClass: 'fa-cog',
+						href: '#'
+					}
 				],
 				footer: '',
 			}
 		},
-		props: ['intent'],
+		watch: {
+			downloadHref: function() {
+				this.icons[0].href = this.downloadHref
+			},
+			twitterHref: function() {
+				this.icons[1].href = this.twitterHref
+			}
+		},
+		props: ['intent', 'downloadHref', 'twitterHref'],
 		mounted: function() {
-			console.log(this.intent)
+
 		},
 		template: `<transition name="modal">
     <div class="modal-mask">
@@ -266,14 +293,13 @@
         </button>
           <div class="modal-header">
             <slot name="header">
-            {{intent}}
-              {{header}}
             </slot>
           </div>
 
           <div class="modal-body">
             <div class="icons">
-            <div class="icon" v-for="icon in icons" v-html=icon @click="$emit('clicker', $event)">
+            <div class="icon" v-for="icon in icons">
+                <a :id="icon.iconId" :href="icon.href"><i class="fa fa-2x" :class="icon.faClass" aria-hidden="true" @click="$emit('clicker', $event)"></i></a>
             </div>
             </div>
           </div>
@@ -294,6 +320,8 @@
 			'modal': modal
 		},
 		data: {
+			twitterHref: '#',
+			downloadHref: '#',
 			intent: '',
 			modalShow: false,
 			pickerValue: '',
@@ -389,17 +417,32 @@
 				let tweet = `https://twitter.com/intent/tweet/hello`
 				this.intent = tweet
 				console.log(this.intent)
+				this.twitterHref = tweet
+				let twitterIcon = this.$refs.modal.$el.children["0"].children["0"].children[2].children["0"].children[1].children["0"]
+				setTimeout(function() {
+					// twitterIcon.click()
+
+				}, 100)
+				// console.log(this.$refs)
+
 
 			},
 			download: function() {
 				// https://stackoverflow.com/questions/8126623/downloading-canvas-element-to-an-image
-				let downloadIcon = this.$refs.modal.$el.children[0].children[0].children[2].children[0].children[0].children[0]
+				// let downloadIcon = this.$refs.modal.$el.children[0].children[0].children[2].children[0].children[0].children[0]
+				let downloadIcon = this.$refs.modal.$el.children["0"].children["0"].children[2].children["0"].children["0"].children["0"]
+				console.log(downloadIcon)
 
 				let canvas = this.$refs.modal.$el.children[0].children[0].children[2].children[1]
 
 				var image = canvas.toDataURL("image/png")
 					.replace("image/png", "image/octet-stream")
-				downloadIcon.setAttribute("href", image);
+				// downloadIcon.setAttribute("href", image);
+				this.downloadHref = image
+				setTimeout(function() {
+					downloadIcon.click()
+
+				}, 100)
 			},
 			closeModal: function() {
 				this.modalShow = false
