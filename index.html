@@ -1,10 +1,4 @@
 <!DOCTYPE html>
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@nytimes">
-<meta name="twitter:creator" content="@SarahMaslinNir">
-<meta name="twitter:title" content="Parade of Fans for Houston’s Funeral">
-<meta name="twitter:description" content="NEWARK - The guest list and parade of limousines with celebrities emerging from them seemed more suited to a red carpet event in Hollywood or New York than than a gritty stretch of Sussex Avenue near the former site of the James M. Baxter Terrace public housing project here.">
-<meta name="twitter:image" content="http://graphics8.nytimes.com/images/2012/02/19/us/19whitney-span/19whitney-span-articleLarge.jpg">
 
 
 
@@ -12,6 +6,9 @@
 <script src="https://use.fontawesome.com/8f6adc7e15.js"></script>
 <script type="text/javascript" src="https://unpkg.com/vue@2.5.10/dist/vue.js"></script>
 <script type="text/javascript" src="https://unpkg.com/html2canvas@1.0.0-alpha.12/dist/html2canvas.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/jso/dist/jso.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
 <style media="screen">
 	.clock-block {
         position: relative;
@@ -183,8 +180,6 @@
 
 </style>
 
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
-
 <div id="app">
 	<section id=controls>
 		<h1>Vue Clock</h1>
@@ -355,7 +350,9 @@
 			this.timeToDegrees(0, "min", true)
 			this.timeToDegrees(0, "sec", true)
 
+
 		},
+
 		mounted: function() {
 			// add default face
 			(face => {
@@ -366,6 +363,57 @@
 				this.checkInterval = this.toCurrentTime(1000)
 			})();
 
+			// this.$nextTick(function() {
+			// let client = new jso.JSO({
+			// 	providerID: "twitter",
+			// 	client_id: "1I7aaMArqvnu2uj85w3zKMNIA",
+			// 	// redirect_uri: "", // The URL where you is redirected back, and where you perform run the callback() function.
+			// 	// authorization: "https://api.twitter.com/1.1/statuses/update.json",
+			// 	debug: true
+			// 	// scopes: {
+			// 	// 	request: ["https://www.googleapis.com/auth/userinfo.profile"]
+			// 	// }
+			// // })
+			let config = {
+				providerID: "twitter",
+				client_id: "1I7aaMArqvnu2uj85w3zKMNIA",
+				authorization: "https://api.twitter.com/oauth/authenticate",
+				response_type: '200',
+				client_secret: "i75wOs7apY0VahusGorUc8MJS6WGqDT8pC4PSoZNTufWHYKtfR",
+				token: "2165890651-TzoVcCpc2ZyAUorbiLBPG2iY3CLn3eHAAUwhwSJ"
+			}
+			let client = new jso.JSO(config)
+			console.log(client)
+			client.callback()
+
+			let f = new jso.Fetcher(client)
+			let url = 'https://api.twitter.com/1.1/statuses/update.json'
+			f.fetch(url, {})
+				.then((data) => {
+					return data.json()
+				})
+				.then((data) => {
+					console.log("I got protected json data from the API", data)
+				})
+				.catch((err) => {
+					console.error("Error from fetcher", err)
+				})
+			// function authorizePopup() {
+			// 	let opts = {
+			// 		redirect_uri: "http://localhost:8001/popupCallback.html"
+			// 	}
+			// 	client.setLoader(client)
+			// 	client.getToken({})
+			// 		.then((token) => {
+			// 			console.log("I got the token: ", token)
+			// 		})
+			// 		.catch((err) => {
+			// 			console.error("Error from passive loader", err)
+			// 		})
+			// }
+			// authorizePopup()
+
+			// }),
 		},
 		computed: {
 			// dynamic aria tag computer
@@ -414,13 +462,14 @@
 			},
 			twitter: function() {
 				// `https://twitter.com/intent/tweet/${image}`
-				let tweet = `https://twitter.com/intent/tweet/hello`
+				let text = "Check out the cool clock images"
+				let tweet = `https://twitter.com/intent/tweet?text=${text}`
 				this.intent = tweet
 				console.log(this.intent)
 				this.twitterHref = tweet
 				let twitterIcon = this.$refs.modal.$el.children["0"].children["0"].children[2].children["0"].children[1].children["0"]
 				setTimeout(function() {
-					// twitterIcon.click()
+					twitterIcon.click()
 
 				}, 100)
 				// console.log(this.$refs)
