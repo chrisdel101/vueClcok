@@ -479,10 +479,10 @@
 				let image = this.canvasToImage()
 				fetch('/twitter', {
 					method: 'POST',
-					// headers: {
-					// 	'Content-Type': 'image/png'
-					// },
-					body: 'HELLO'
+					headers: {
+						'Content-Type': 'image/png'
+					},
+					body: image
 				}).then(res => console.log('res', res.text()))
 
 
@@ -490,7 +490,6 @@
 			download: function() {
 				// https://stackoverflow.com/questions/8126623/downloading-canvas-element-to-an-image
 				let downloadIcon = this.$refs.modal.$el.children["0"].children["0"].children[2].children["0"].children["0"].children["0"]
-				console.log(downloadIcon)
 				// make canvas an image
 				let image = this.canvasToImage()
 				this.downloadHref = image
