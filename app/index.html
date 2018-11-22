@@ -268,6 +268,7 @@
 			}
 		},
 		watch: {
+			// set hrefs to each icon when called
 			downloadHref: function() {
 				this.icons[0].href = this.downloadHref
 			},
@@ -342,7 +343,8 @@
 			tickerModel: true,
 			secondHandModel: true,
 			lastTimeSet: [12, 0, 0],
-			checkInterval: 0
+			checkInterval: 0,
+			downloadImageStore: ''
 		},
 		created: function() {
 			// set to 12 on start
@@ -374,30 +376,30 @@
 			// 	// 	request: ["https://www.googleapis.com/auth/userinfo.profile"]
 			// 	// }
 			// // })
-			let config = {
-				providerID: "twitter",
-				client_id: "1I7aaMArqvnu2uj85w3zKMNIA",
-				authorization: "https://api.twitter.com/oauth/authenticate",
-				response_type: '200',
-				client_secret: "i75wOs7apY0VahusGorUc8MJS6WGqDT8pC4PSoZNTufWHYKtfR",
-				token: "2165890651-TzoVcCpc2ZyAUorbiLBPG2iY3CLn3eHAAUwhwSJ"
-			}
-			let client = new jso.JSO(config)
-			console.log(client)
-			client.callback()
-
-			let f = new jso.Fetcher(client)
-			let url = 'https://api.twitter.com/1.1/statuses/update.json'
-			f.fetch(url, {})
-				.then((data) => {
-					return data.json()
-				})
-				.then((data) => {
-					console.log("I got protected json data from the API", data)
-				})
-				.catch((err) => {
-					console.error("Error from fetcher", err)
-				})
+			// let config = {
+			// 	providerID: "twitter",
+			// 	client_id: "1I7aaMArqvnu2uj85w3zKMNIA",
+			// 	authorization: "https://api.twitter.com/oauth/authenticate",
+			// 	response_type: '200',
+			// 	client_secret: "i75wOs7apY0VahusGorUc8MJS6WGqDT8pC4PSoZNTufWHYKtfR",
+			// 	token: "2165890651-TzoVcCpc2ZyAUorbiLBPG2iY3CLn3eHAAUwhwSJ"
+			// }
+			// let client = new jso.JSO(config)
+			// console.log(client)
+			// client.callback()
+			//
+			// let f = new jso.Fetcher(client)
+			// let url = 'https://api.twitter.com/1.1/statuses/update.json'
+			// f.fetch(url, {})
+			// 	.then((data) => {
+			// 		return data.json()
+			// 	})
+			// 	.then((data) => {
+			// 		console.log("I got protected json data from the API", data)
+			// 	})
+			// 	.catch((err) => {
+			// 		console.error("Error from fetcher", err)
+			// 	})
 			// function authorizePopup() {
 			// 	let opts = {
 			// 		redirect_uri: "http://localhost:8001/popupCallback.html"
@@ -462,36 +464,48 @@
 			},
 			twitter: function() {
 				// `https://twitter.com/intent/tweet/${image}`
-				let text = "Check out the cool clock images"
-				let tweet = `https://twitter.com/intent/tweet?text=${text}`
-				this.intent = tweet
-				console.log(this.intent)
-				this.twitterHref = tweet
-				let twitterIcon = this.$refs.modal.$el.children["0"].children["0"].children[2].children["0"].children[1].children["0"]
-				setTimeout(function() {
-					twitterIcon.click()
-
-				}, 100)
-				// console.log(this.$refs)
+				// OPEN INTENT
+				// let text = "Check out the cool clock images"
+				// let tweet = `https://twitter.com/intent/tweet?text=${text}`
+				// this.intent = tweet
+				// console.log(this.intent)
+				// this.twitterHref = tweet
+				// let twitterIcon = this.$refs.modal.$el.children["0"].children["0"].children[2].children["0"].children[1].children["0"]
+				// setTimeout(function() {
+				// 	twitterIcon.click()
+				//
+				// }, 100)
+				console.log('twitter')
+				let image = this.canvasToImage()
+				fetch('/twitter', {
+					method: 'POST',
+					// headers: {
+					// 	'Content-Type': 'image/png'
+					// },
+					body: 'HELLO'
+				}).then(res => console.log('res', res.text()))
 
 
 			},
 			download: function() {
 				// https://stackoverflow.com/questions/8126623/downloading-canvas-element-to-an-image
-				// let downloadIcon = this.$refs.modal.$el.children[0].children[0].children[2].children[0].children[0].children[0]
 				let downloadIcon = this.$refs.modal.$el.children["0"].children["0"].children[2].children["0"].children["0"].children["0"]
 				console.log(downloadIcon)
-
-				let canvas = this.$refs.modal.$el.children[0].children[0].children[2].children[1]
-
-				var image = canvas.toDataURL("image/png")
-					.replace("image/png", "image/octet-stream")
-				// downloadIcon.setAttribute("href", image);
+				// make canvas an image
+				let image = this.canvasToImage()
 				this.downloadHref = image
+				// timeout to set href properly
 				setTimeout(function() {
 					downloadIcon.click()
 
 				}, 100)
+				this.downloadImageStore = image
+			},
+			canvasToImage: function() {
+				let canvas = this.$refs.modal.$el.children[0].children[0].children[2].children[1]
+				var image = canvas.toDataURL("image/png")
+					.replace("image/png", "image/octet-stream")
+				return image
 			},
 			closeModal: function() {
 				this.modalShow = false
