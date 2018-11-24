@@ -3,6 +3,10 @@ const https = require('http')
 const fs = require('fs')
 const path = require('path')
 const Twitter = require('twitter')
+const streamTransform = require('stream').Transform
+const Stream = require('stream')
+
+
 
 
 const client = new Twitter({
@@ -44,8 +48,10 @@ https.createServer(function(req, res) {
 		});
 
 	} else if (req.url === "/twitter") {
-		let body = [];
+		// let body = [];
 		new Promise((resolve, reject) => {
+				var data = new streamTransform()
+
 				req.on('error', (err) => {
 					if (err) {
 						console.error(err);
@@ -53,27 +59,53 @@ https.createServer(function(req, res) {
 					}
 				}).on('data', (chunk) => {
 					// console.log(chunk)
-					body.push(chunk);
+					data.push(chunk)
 				}).on('end', () => {
+					data = data.read()
+					var bufferStream = new Stream.PassThrough()
+
+					// Write your buffer
+					bufferStream.end(new Buffer(data))
 					// if (body === typeof 'string') {
-					body = Buffer.concat(body).toString();
+					// body = Buffer.concat(body).toString();
 					// }
 					// console.log('body', body)
 					// console.log('body', body)
-					resolve(body)
+					resolve(bufferStream)
 				})
 			})
 			.then(base64Data => {
 				console.log('base64', base64Data)
+				// base64Data.pipe(process.stdout)
+				// base64Data = base64Data.replace(/^data:image\/png;base64,/, "")
+				// base64Data += base64Data.replace('+', ' ')
+				// let binaryData = new Buffer(base64Data, 'base64').toString('binary')
 
-				new Promise((resolve, reject) => {
-						fs.writeFile("out.png", base64Data, (err) => {
-							if (err) throw err;
-							console.log('The file has been saved!');
-						})
-					})
-					.then(image => console.log(image))
-					.catch(err => console.error(err))
+				// console.log(base64Data.substring(0, 40))
+				// new Promise((resolve, reject) => {
+				// fs.writeFile("clock", binaryData, 'binary', (err) => {
+				// 	if (err) {
+				// 		throw err
+				// 		// reject(err)
+				// 		// } else {
+				// 		// 	resolve(base64Data)
+				// 		// }
+				// 	}
+				// 	console.log('The file has been saved!');
+				//
+				// })
+				// .then(data => {
+				// 	data = data.replace(/^data:image\/png;base64,/, "");
+				// 	console.log('base64', data.substring(0, 20))
+				//
+				// })
+				// .catch(err => console.error(err))
+				// fs.unlink('out.png', function(err) {
+				// 	if (err) {
+				// 		error('Unlink error', err)
+				// 	}
+				// 	console.log('unlinked')
+				// })
 				// 	// image = new Buffer(image).toString('base64')
 				// 	// console.log(image)
 				// 	// var params = {
