@@ -78,97 +78,52 @@ https.createServer(function(req, res) {
 			.then(base64Data => {
 				// console.log('below', base64Data.substring(1, 150))
 				base64Data = decodeBase64Image(base64Data)
-				let file = fs.writeFileSync('test.png', base64Data.data, 'base64')
-				// decode = decodeBase64Image(body)
-				// console.log('push to decode', decode)
-				// new Promise((resolve, reject) => {
-				// 		fs.writeFile("out", base64Data, (err) => {
-				// 			if (err) throw err;
-				// 			console.log('The file has been saved!');
-				// 		})
-				// 	})
-				// 	.then(image => console.log(image))
-				// 	.catch(err => console.error(err))
-				// 	// image = new Buffer(image).toString('base64')
-				// 	// console.log(image)
-				// 	// var params = {
-				// 	// 	screen_name: 'nodejs'
-				// 	// };
-				// 	// // client.get('statuses/user_timeline', params, function(error, tweets, response) {
-				// 	// // 	if (!error) {
-				// 	// // 		console.log(tweets);
-				// 	// // 	}
-				// 	// // });
-				// 	let imageFile = fs.readFileSync('/Users/chrisdielschnieder/desktop/screenshot.png')
-				// 	// console.log('image', image)
-				// 	client.post('/media/upload', {
-				// 		media: imageFile
-				// 	}, function(error, media, response) {
-				// 		if (error) {
-				// 			console.log(error);
-				// 			throw new Error
-				// 		}
-				//
-				// 		console.log(media); // Tweet body.
-				// 		console.log(response); // Raw response object.
-				// 		// });
-				// 		// client.post('media/upload', {
-				// 		// 	media: '/desktop/screenshot'
-				// 		// }, function(error, media, response) {
-				// 		// 	console.log(image)
-				// 		// 	if (!error) {
-				// 		//
-				// 		// 		// If successful, a media object will be returned.
-				// 		// 		console.log(media);
-				// 		//
-				// 		// Lets tweet it
-				// 		var status = {
-				// 			status: 'I am a tweet',
-				// 			media_ids: media.media_id_string // Pass the media id string
-				// 		}
-				// 		//
-				// 		client.post('statuses/update', status, function(error, tweet, response) {
-				// 			if (!error) {
-				// 				console.log(tweet);
-				// 			}
-				// 		});
-				// 		//
-				// 		// 	} else {
-				// 		// 		console.error('Error', error)
-				// 		// 	}
-				// 	});
-				// 	// const options = {
-				// 	// 	hostname: 'upload.twitter.com',
-				// 	// 	path: '/1.1/media/upload.json',
-				// 	// 	method: 'POST',
-				// 	// 	headers: {
-				// 	// 		'Content-Type': 'application/x-www-form-urlencoded'
-				// 	// 	}
-				// 	// }
-				// 	// console.log('options', options)
-				// 	// const req = https.request(options, (res) => {
-				// 	// 	console.log('request made')
-				// 	// 	// console.log(`STATUS: ${res.statusCode}`);
-				// 	// 	// console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-				// 	// 	// res.setEncoding('utf8');
-				// 	// 	// res.on('data', (chunk) => {
-				// 	// 	// 	console.log(chunk)
-				// 	// 	// 	console.log(`BODY: ${chunk}`);
-				// 	// 	// });
-				// 	// 	// res.on('end', () => {
-				// 	// 	// 	console.log('No more data in response.');
-				// 	// 	//
-				// 	// 	// });
-				// 	// });
-				// 	//
-				// 	// req.on('error', (e) => {
-				// 	// 	console.error(`problem with request: ${e.message}`);
-				// 	// });
-				// 	// req.write(image)
+				let file = fs.writeFileSync('clock.png', base64Data.data, 'base64')
+
+
+				var params = {
+					screen_name: 'nodejs'
+				};
+				client.get('statuses/user_timeline', params, function(error, tweets, response) {
+					if (!error) {
+						console.log(tweets);
+					}
+				});
+				let imageFile = fs.readFileSync('/Users/chrisdielschnieder/desktop/code_work/vue/clock_html/app/clock.png')
+				// console.log('image', image)
+				client.post('media/upload', {
+					media: imageFile
+				}, function(error, media, response) {
+
+					if (!error) {
+
+						// If successful, a media object will be returned.
+						console.log(media);
+
+						// Lets tweet it
+						var status = {
+							status: 'I am a tweet',
+							media_ids: media.media_id_string // Pass the media id string
+						}
+
+						client.post('statuses/update', status, function(error, tweet, response) {
+							if (!error) {
+								console.log(tweet);
+							}
+						});
+
+					}
+				});
+				res.end()
 			}).catch((e) => {
 
 				console.error('error', e)
 			})
+
+		req.on('error', (e) => {
+			console.error(`problem with request: ${e.message}`);
+		});
+		// 	// req.write(image)
 	} else if (req.url === '/hello') {
 
 		// var request = require('request'),
