@@ -354,7 +354,6 @@
 
 
 		},
-
 		mounted: function() {
 			// add default face
 			(face => {
@@ -364,58 +363,6 @@
 				// set to current time
 				this.checkInterval = this.toCurrentTime(1000)
 			})();
-
-			// this.$nextTick(function() {
-			// let client = new jso.JSO({
-			// 	providerID: "twitter",
-			// 	client_id: "1I7aaMArqvnu2uj85w3zKMNIA",
-			// 	// redirect_uri: "", // The URL where you is redirected back, and where you perform run the callback() function.
-			// 	// authorization: "https://api.twitter.com/1.1/statuses/update.json",
-			// 	debug: true
-			// 	// scopes: {
-			// 	// 	request: ["https://www.googleapis.com/auth/userinfo.profile"]
-			// 	// }
-			// // })
-			// let config = {
-			// 	providerID: "twitter",
-			// 	client_id: "1I7aaMArqvnu2uj85w3zKMNIA",
-			// 	authorization: "https://api.twitter.com/oauth/authenticate",
-			// 	response_type: '200',
-			// 	client_secret: "i75wOs7apY0VahusGorUc8MJS6WGqDT8pC4PSoZNTufWHYKtfR",
-			// 	token: "2165890651-TzoVcCpc2ZyAUorbiLBPG2iY3CLn3eHAAUwhwSJ"
-			// }
-			// let client = new jso.JSO(config)
-			// console.log(client)
-			// client.callback()
-			//
-			// let f = new jso.Fetcher(client)
-			// let url = 'https://api.twitter.com/1.1/statuses/update.json'
-			// f.fetch(url, {})
-			// 	.then((data) => {
-			// 		return data.json()
-			// 	})
-			// 	.then((data) => {
-			// 		console.log("I got protected json data from the API", data)
-			// 	})
-			// 	.catch((err) => {
-			// 		console.error("Error from fetcher", err)
-			// 	})
-			// function authorizePopup() {
-			// 	let opts = {
-			// 		redirect_uri: "http://localhost:8001/popupCallback.html"
-			// 	}
-			// 	client.setLoader(client)
-			// 	client.getToken({})
-			// 		.then((token) => {
-			// 			console.log("I got the token: ", token)
-			// 		})
-			// 		.catch((err) => {
-			// 			console.error("Error from passive loader", err)
-			// 		})
-			// }
-			// authorizePopup()
-
-			// }),
 		},
 		computed: {
 			// dynamic aria tag computer
@@ -450,7 +397,7 @@
 				} else if (e.target.className.includes('twitter')) {
 					this.twitter()
 				} else if (e.target.className.includes('facebook')) {
-
+					this.facebook()
 				} else if (e.target.className.includes('reddit')) {
 
 				} else if (e.target.className.includes('reddit')) {
@@ -461,6 +408,45 @@
 					// error, icon not hooked up
 					alert('Error: that icon is invalid.')
 				}
+			},
+			facebook: function() {
+				let img = document.createElement('img')
+				fetch('/test', {
+						method: 'GET'
+					})
+					.then(res => {
+						const reader = res.body.getReader()
+						return new ReadableStream({
+							start(controller) {
+								return pump();
+
+								function pump() {
+									return reader.read().then(({
+										done,
+										value
+									}) => {
+										// When no more data needs to be consumed, close the stream
+										if (done) {
+											controller.close();
+											return;
+										}
+										// Enqueue the next data chunk into our target stream
+										controller.enqueue(value);
+										return pump();
+									});
+								}
+							}
+						})
+					})
+					.then(stream => new Response(stream))
+					.then(response => response.blob())
+					.then(blob => URL.createObjectURL(blob))
+					.then(url => {
+						img.src = url
+						console.log(img.src)
+					})
+					.catch(err => console.error(err));
+
 			},
 			twitter: function() {
 				// `https://twitter.com/intent/tweet/${image}`
@@ -477,13 +463,20 @@
 				// }, 100)
 				console.log('twitter')
 				let image = this.canvasToImage()
+				console.log('image', image.substring(1, 150))
 				fetch('/twitter', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'image/png'
 					},
 					body: image
-				}).then(res => console.log('res', res.text()))
+				})
+				// test image is working
+				// this.$nextTick(function() {
+				// 	let img = document.createElement('img')
+				// 	img.src = image
+				// 	document.querySelector('#controls').appendChild(img)
+				// })
 
 
 			},
@@ -504,6 +497,7 @@
 				let canvas = this.$refs.modal.$el.children[0].children[0].children[2].children[1]
 				var image = canvas.toDataURL("image/png")
 					.replace("image/png", "image/octet-stream")
+				console.log('IMAGE', image.substring(1, 150))
 				return image
 			},
 			closeModal: function() {

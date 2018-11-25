@@ -27,6 +27,7 @@ const client = new Twitter({
 // 		console.log('ERROR', error)
 // 	}
 // });
+var decode = ''
 https.createServer(function(req, res) {
 
 	console.log(`${req.method} request for ${req.url}`)
@@ -69,128 +70,91 @@ https.createServer(function(req, res) {
 					// if (body === typeof 'string') {
 					// body = Buffer.concat(body).toString();
 					// }
+					// var request = require('request'),
+					// 	url = 'http://upload.wikimedia.org/wikipedia/commons/8/8c/JPEG_example_JPG_RIP_025.jpg';
+
+					// console.log()
+					// fs.writeFile('downloaded.jpg', body, 'binary', function(err) {});
+					// console.log(body)
+					// console.log('body', body.substring(1, 150))
 					// console.log('body', body)
-					// console.log('body', body)
-					resolve(bufferStream)
-				})
+					resolve(body)
+				});
+
+				// decode = body
+				// console.log('push to decode')
 			})
+			// })
 			.then(base64Data => {
-				console.log('base64', base64Data)
-				// base64Data.pipe(process.stdout)
-				// base64Data = base64Data.replace(/^data:image\/png;base64,/, "")
-				// base64Data += base64Data.replace('+', ' ')
-				// let binaryData = new Buffer(base64Data, 'base64').toString('binary')
+				// console.log('below', base64Data.substring(1, 150))
+				base64Data = decodeBase64Image(base64Data)
+				let file = fs.writeFileSync('clock.png', base64Data.data, 'base64')
 
-				// console.log(base64Data.substring(0, 40))
-				// new Promise((resolve, reject) => {
-				// fs.writeFile("clock", binaryData, 'binary', (err) => {
-				// 	if (err) {
-				// 		throw err
-				// 		// reject(err)
-				// 		// } else {
-				// 		// 	resolve(base64Data)
-				// 		// }
-				// 	}
-				// 	console.log('The file has been saved!');
-				//
-				// })
-				// .then(data => {
-				// 	data = data.replace(/^data:image\/png;base64,/, "");
-				// 	console.log('base64', data.substring(0, 20))
-				//
-				// })
-				// .catch(err => console.error(err))
-				// fs.unlink('out.png', function(err) {
-				// 	if (err) {
-				// 		error('Unlink error', err)
-				// 	}
-				// 	console.log('unlinked')
-				// })
-				// 	// image = new Buffer(image).toString('base64')
-				// 	// console.log(image)
-				// 	// var params = {
-				// 	// 	screen_name: 'nodejs'
-				// 	// };
-				// 	// // client.get('statuses/user_timeline', params, function(error, tweets, response) {
-				// 	// // 	if (!error) {
-				// 	// // 		console.log(tweets);
-				// 	// // 	}
-				// 	// // });
-				// 	let imageFile = fs.readFileSync('/Users/chrisdielschnieder/desktop/screenshot.png')
-				// 	// console.log('image', image)
-				// 	client.post('/media/upload', {
-				// 		media: imageFile
-				// 	}, function(error, media, response) {
-				// 		if (error) {
-				// 			console.log(error);
-				// 			throw new Error
-				// 		}
-				//
-				// 		console.log(media); // Tweet body.
-				// 		console.log(response); // Raw response object.
-				// 		// });
-				// 		// client.post('media/upload', {
-				// 		// 	media: '/desktop/screenshot'
-				// 		// }, function(error, media, response) {
-				// 		// 	console.log(image)
-				// 		// 	if (!error) {
-				// 		//
-				// 		// 		// If successful, a media object will be returned.
-				// 		// 		console.log(media);
-				// 		//
-				// 		// Lets tweet it
-				// 		var status = {
-				// 			status: 'I am a tweet',
-				// 			media_ids: media.media_id_string // Pass the media id string
-				// 		}
-				// 		//
-				// 		client.post('statuses/update', status, function(error, tweet, response) {
-				// 			if (!error) {
-				// 				console.log(tweet);
-				// 			}
-				// 		});
-				// 		//
-				// 		// 	} else {
-				// 		// 		console.error('Error', error)
-				// 		// 	}
-				// 	});
-				// 	// const options = {
-				// 	// 	hostname: 'upload.twitter.com',
-				// 	// 	path: '/1.1/media/upload.json',
-				// 	// 	method: 'POST',
-				// 	// 	headers: {
-				// 	// 		'Content-Type': 'application/x-www-form-urlencoded'
-				// 	// 	}
-				// 	// }
-				// 	// console.log('options', options)
-				// 	// const req = https.request(options, (res) => {
-				// 	// 	console.log('request made')
-				// 	// 	// console.log(`STATUS: ${res.statusCode}`);
-				// 	// 	// console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-				// 	// 	// res.setEncoding('utf8');
-				// 	// 	// res.on('data', (chunk) => {
-				// 	// 	// 	console.log(chunk)
-				// 	// 	// 	console.log(`BODY: ${chunk}`);
-				// 	// 	// });
-				// 	// 	// res.on('end', () => {
-				// 	// 	// 	console.log('No more data in response.');
-				// 	// 	//
-				// 	// 	// });
-				// 	// });
-				// 	//
-				// 	// req.on('error', (e) => {
-				// 	// 	console.error(`problem with request: ${e.message}`);
-				// 	// });
-				// 	// req.write(image)
-				// }).catch((e) => {
-				//
-				// 	console.error('error', e)
+
+				var params = {
+					screen_name: 'nodejs'
+				};
+				client.get('statuses/user_timeline', params, function(error, tweets, response) {
+					if (!error) {
+						console.log(tweets);
+					}
+				});
+				let imageFile = fs.readFileSync('/Users/chrisdielschnieder/desktop/code_work/vue/clock_html/app/clock.png')
+				// console.log('image', image)
+				client.post('media/upload', {
+					media: imageFile
+				}, function(error, media, response) {
+
+					if (!error) {
+
+						// If successful, a media object will be returned.
+						console.log(media);
+
+						// Lets tweet it
+						var status = {
+							status: 'I am a tweet',
+							media_ids: media.media_id_string // Pass the media id string
+						}
+
+						client.post('statuses/update', status, function(error, tweet, response) {
+							if (!error) {
+								console.log(tweet);
+							}
+						});
+
+					}
+				});
+				res.end()
+			}).catch((e) => {
+
+				console.error('error', e)
 			})
 
+		req.on('error', (e) => {
+			console.error(`problem with request: ${e.message}`);
+		});
+		// 	// req.write(image)
+	} else if (req.url === '/hello') {
 
-
-
-
+		// var request = require('request'),
+		// 	url = 'http://upload.wikimedia.org/wikipedia/commons/8/8c/JPEG_example_JPG_RIP_025.jpg';
+		//
+		// request(url, {
+		// 	encoding: 'binary'
+		// }, function(error, response, body) {
+		// 	fs.writeFile('downloaded.jpg', body, 'binary', function(err) {});
+		// });
+	} else if (req.url === '/test') {
+		// console.log(res)
+		// res.writeHead(404, {
+		// 	"Content-Type": "text/plain"
+		// });
+		// console.log('decode', decode.substring(0, 300))
+		// console.log('decode', decode.substr(-10   ))
+		res.write(decode)
+		decode = ''
+		// console.log('decode', decode.substring(0, 300))
+		res.end()
 		// -------------404-----------------------
 		// if not homepage, return headers that respond with 404
 	} else {
@@ -201,6 +165,19 @@ https.createServer(function(req, res) {
 
 	}
 
+	function decodeBase64Image(dataString) {
+		var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+			response = {};
+
+		if (matches.length !== 3) {
+			return new Error('Invalid input string');
+		}
+
+		response.type = matches[1];
+		response.data = new Buffer(matches[2], 'base64');
+
+		return response;
+	}
 }).listen(3000); //server req
 
 
