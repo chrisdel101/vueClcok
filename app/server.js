@@ -23,6 +23,7 @@ const client = new Twitter({
 // 		console.log('ERROR', error)
 // 	}
 // });
+var decode = ''
 https.createServer(function(req, res) {
 
 	console.log(`${req.method} request for ${req.url}`)
@@ -44,6 +45,7 @@ https.createServer(function(req, res) {
 		});
 
 	} else if (req.url === "/twitter") {
+
 		let body = [];
 		new Promise((resolve, reject) => {
 				req.on('error', (err) => {
@@ -58,22 +60,25 @@ https.createServer(function(req, res) {
 					// if (body === typeof 'string') {
 					body = Buffer.concat(body).toString();
 					// }
+
+					decode = body
+					console.log('push to decode')
+					console.log('body', body.substr(-10))
 					// console.log('body', body)
-					// console.log('body', body)
-					resolve(body)
+					resolve(decode)
 				})
 			})
 			.then(base64Data => {
-				console.log('base64', base64Data)
-
-				new Promise((resolve, reject) => {
-						fs.writeFile("out.png", base64Data, (err) => {
-							if (err) throw err;
-							console.log('The file has been saved!');
-						})
-					})
-					.then(image => console.log(image))
-					.catch(err => console.error(err))
+				// decode = decodeBase64Image(body)
+				// console.log('push to decode', decode)
+				// new Promise((resolve, reject) => {
+				// 		fs.writeFile("out", base64Data, (err) => {
+				// 			if (err) throw err;
+				// 			console.log('The file has been saved!');
+				// 		})
+				// 	})
+				// 	.then(image => console.log(image))
+				// 	.catch(err => console.error(err))
 				// 	// image = new Buffer(image).toString('base64')
 				// 	// console.log(image)
 				// 	// var params = {
@@ -154,11 +159,17 @@ https.createServer(function(req, res) {
 				//
 				// 	console.error('error', e)
 			})
-
-
-
-
-
+	} else if (req.url === '/test') {
+		// console.log(res)
+		// res.writeHead(404, {
+		// 	"Content-Type": "text/plain"
+		// });
+		// console.log('decode', decode.substring(0, 300))
+		// console.log('decode', decode.substr(-10   ))
+		res.write(decode)
+		decode = ''
+		// console.log('decode', decode.substring(0, 300))
+		res.end()
 		// -------------404-----------------------
 		// if not homepage, return headers that respond with 404
 	} else {
@@ -169,6 +180,19 @@ https.createServer(function(req, res) {
 
 	}
 
+	function decodeBase64Image(dataString) {
+		var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+			response = {};
+
+		if (matches.length !== 3) {
+			return new Error('Invalid input string');
+		}
+
+		response.type = matches[1];
+		response.data = new Buffer(matches[2], 'base64');
+
+		return response;
+	}
 }).listen(3000); //server req
 
 
