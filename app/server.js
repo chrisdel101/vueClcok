@@ -45,7 +45,7 @@ https.createServer(function(req, res) {
 		});
 
 	} else if (req.url === "/twitter") {
-
+		// receieves a POST
 		let body = [];
 		new Promise((resolve, reject) => {
 				req.on('error', (err) => {
@@ -60,15 +60,25 @@ https.createServer(function(req, res) {
 					// if (body === typeof 'string') {
 					body = Buffer.concat(body).toString();
 					// }
+					// var request = require('request'),
+					// 	url = 'http://upload.wikimedia.org/wikipedia/commons/8/8c/JPEG_example_JPG_RIP_025.jpg';
 
-					decode = body
-					console.log('push to decode')
-					console.log('body', body.substr(-10))
+					// console.log()
+					// fs.writeFile('downloaded.jpg', body, 'binary', function(err) {});
+					// console.log(body)
+					// console.log('body', body.substring(1, 150))
 					// console.log('body', body)
-					resolve(decode)
-				})
+					resolve(body)
+				});
+
+				// decode = body
+				// console.log('push to decode')
 			})
+			// })
 			.then(base64Data => {
+				// console.log('below', base64Data.substring(1, 150))
+				base64Data = decodeBase64Image(base64Data)
+				let file = fs.writeFileSync('test.png', base64Data.data, 'base64')
 				// decode = decodeBase64Image(body)
 				// console.log('push to decode', decode)
 				// new Promise((resolve, reject) => {
@@ -155,10 +165,20 @@ https.createServer(function(req, res) {
 				// 	// 	console.error(`problem with request: ${e.message}`);
 				// 	// });
 				// 	// req.write(image)
-				// }).catch((e) => {
-				//
-				// 	console.error('error', e)
+			}).catch((e) => {
+
+				console.error('error', e)
 			})
+	} else if (req.url === '/hello') {
+
+		// var request = require('request'),
+		// 	url = 'http://upload.wikimedia.org/wikipedia/commons/8/8c/JPEG_example_JPG_RIP_025.jpg';
+		//
+		// request(url, {
+		// 	encoding: 'binary'
+		// }, function(error, response, body) {
+		// 	fs.writeFile('downloaded.jpg', body, 'binary', function(err) {});
+		// });
 	} else if (req.url === '/test') {
 		// console.log(res)
 		// res.writeHead(404, {

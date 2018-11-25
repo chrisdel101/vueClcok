@@ -410,19 +410,43 @@
 				}
 			},
 			facebook: function() {
+				let img = document.createElement('img')
 				fetch('/test', {
 						method: 'GET'
 					})
 					.then(res => {
-						console.log(res.body)
-						// return res.blob()
-					}).then(body => {
-						const reader = body.getReader();
-						console.log('res', res)
-						// var objectURL = URL.createObjectURL(res)
-						// console.log(objectURL)
-						// myImage.src = objectURL;
+						const reader = res.body.getReader()
+						return new ReadableStream({
+							start(controller) {
+								return pump();
+
+								function pump() {
+									return reader.read().then(({
+										done,
+										value
+									}) => {
+										// When no more data needs to be consumed, close the stream
+										if (done) {
+											controller.close();
+											return;
+										}
+										// Enqueue the next data chunk into our target stream
+										controller.enqueue(value);
+										return pump();
+									});
+								}
+							}
+						})
 					})
+					.then(stream => new Response(stream))
+					.then(response => response.blob())
+					.then(blob => URL.createObjectURL(blob))
+					.then(url => {
+						img.src = url
+						console.log(img.src)
+					})
+					.catch(err => console.error(err));
+
 			},
 			twitter: function() {
 				// `https://twitter.com/intent/tweet/${image}`
@@ -439,10 +463,11 @@
 				// }, 100)
 				console.log('twitter')
 				let image = this.canvasToImage()
+				console.log('image', image.substring(1, 150))
 				fetch('/twitter', {
 					method: 'POST',
 					headers: {
-						'Content-Type': 'image/octet-steam'
+						'Content-Type': 'image/png'
 					},
 					body: image
 				})
@@ -472,6 +497,7 @@
 				let canvas = this.$refs.modal.$el.children[0].children[0].children[2].children[1]
 				var image = canvas.toDataURL("image/png")
 					.replace("image/png", "image/octet-stream")
+				console.log('IMAGE', image.substring(1, 150))
 				return image
 			},
 			closeModal: function() {
