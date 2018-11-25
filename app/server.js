@@ -49,10 +49,9 @@ https.createServer(function(req, res) {
 		});
 
 	} else if (req.url === "/twitter") {
-		// let body = [];
+		// receieves a POST
+		let body = [];
 		new Promise((resolve, reject) => {
-				var data = new streamTransform()
-
 				req.on('error', (err) => {
 					if (err) {
 						console.error(err);
@@ -60,15 +59,10 @@ https.createServer(function(req, res) {
 					}
 				}).on('data', (chunk) => {
 					// console.log(chunk)
-					data.push(chunk)
+					body.push(chunk);
 				}).on('end', () => {
-					data = data.read()
-					var bufferStream = new Stream.PassThrough()
-
-					// Write your buffer
-					bufferStream.end(new Buffer(data))
 					// if (body === typeof 'string') {
-					// body = Buffer.concat(body).toString();
+					body = Buffer.concat(body).toString();
 					// }
 					// var request = require('request'),
 					// 	url = 'http://upload.wikimedia.org/wikipedia/commons/8/8c/JPEG_example_JPG_RIP_025.jpg';
