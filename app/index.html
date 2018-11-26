@@ -470,7 +470,20 @@
 						'Content-Type': 'image/png'
 					},
 					body: image
+				}).then((outerRes) => {
+					fetch('/twitter')
+						.then((innerRes) => {
+							console.log(innerRes)
+							const response2 = innerRes.blob()
+							return response2
+						})
+						.then((response) => {
+							// var objectURL = URL.createObjectURL(blob);
+							console.log(response)
+
+						})
 				})
+
 				// test image is working
 				// this.$nextTick(function() {
 				// 	let img = document.createElement('img')
