@@ -344,13 +344,23 @@
 			secondHandModel: true,
 			lastTimeSet: [12, 0, 0],
 			checkInterval: 0,
-			downloadImageStore: ''
+			downloadImageStore: '',
+			face: ''
 		},
 		created: function() {
 			// set to 12 on start
 			this.timeToDegrees(12, "hour", true)
 			this.timeToDegrees(0, "min", true)
 			this.timeToDegrees(0, "sec", true)
+
+			window.fbAsyncInit = function() {
+				let face = FB.init({
+					appId: '331673361004110',
+					autoLogAppEvents: true,
+					xfbml: true,
+					version: 'v3.2'
+				});
+			};
 
 
 		},
@@ -363,6 +373,7 @@
 				// set to current time
 				this.checkInterval = this.toCurrentTime(1000)
 			})();
+
 		},
 		computed: {
 			// dynamic aria tag computer
@@ -410,42 +421,71 @@
 				}
 			},
 			facebook: function() {
-				let img = document.createElement('img')
-				fetch('/test', {
-						method: 'GET'
-					})
-					.then(res => {
-						const reader = res.body.getReader()
-						return new ReadableStream({
-							start(controller) {
-								return pump();
+				// window.fbAsyncInit = function() {
+				// 	FB.init({
+				// 		appId: '331673361004110',
+				// 		autoLogAppEvents: true,
+				// 		xfbml: true,
+				// 		version: 'v3.2'
+				// 	});
+				// };
 
-								function pump() {
-									return reader.read().then(({
-										done,
-										value
-									}) => {
-										// When no more data needs to be consumed, close the stream
-										if (done) {
-											controller.close();
-											return;
-										}
-										// Enqueue the next data chunk into our target stream
-										controller.enqueue(value);
-										return pump();
-									});
-								}
-							}
-						})
+				(function(d, s, id) {
+					var js, fjs = d.getElementsByTagName(s)[0];
+					if (d.getElementById(id)) {
+						return;
+					}
+					// console.log('inside')
+					js = d.createElement(s);
+					js.id = id;
+					js.src = "https://connect.facebook.net/en_US/sdk.js";
+					fjs.parentNode.insertBefore(js, fjs);
+				}(document, 'script', 'facebook-jssdk'));
+				setTimeout(function() {
+					FB.ui({
+						method: 'share',
+						href: 'https://developers.facebook.com/docs/',
+					}, function(response) {
+						console.log(response)
 					})
-					.then(stream => new Response(stream))
-					.then(response => response.blob())
-					.then(blob => URL.createObjectURL(blob))
-					.then(url => {
-						img.src = url
-						console.log(img.src)
-					})
-					.catch(err => console.error(err));
+				}, 100)
+				// let img = document.createElement('img')
+				// fetch('/test', {
+				// 		method: 'GET'
+				// 	})
+				// 	.then(res => {
+				// 		const reader = res.body.getReader()
+				// 		return new ReadableStream({
+				// 			start(controller) {
+				// 				return pump();
+				//
+				// 				function pump() {
+				// 					return reader.read().then(({
+				// 						done,
+				// 						value
+				// 					}) => {
+				// 						// When no more data needs to be consumed, close the stream
+				// 						if (done) {
+				// 							controller.close();
+				// 							return;
+				// 						}
+				// 						// Enqueue the next data chunk into our target stream
+				// 						controller.enqueue(value);
+				// 						return pump();
+				// 					});
+				// 				}
+				// 			}
+				// 		})
+				// 	})
+				// 	.then(stream => new Response(stream))
+				// 	.then(response => response.blob())
+				// 	.then(blob => URL.createObjectURL(blob))
+				// 	.then(url => {
+				// 		img.src = url
+				// 		console.log(img.src)
+				// 	})
+				// 	.catch(err => console.error(err));
+
 
 			},
 			twitter: function() {
