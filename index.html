@@ -181,8 +181,12 @@
 </style>
 
 <div id="app">
-	<meta property="og:image" content="https://www.guidedogs.org/wp-content/uploads/2018/01/Mobile.jpg">
-	<meta property="og:image:secure_url" content="https://www.guidedogs.org/wp-content/uploads/2018/01/Mobile.jpg">
+	<meta property="og:image" content="http://res.cloudinary.com/chris-del/image/upload/v1543606677/Screen_Shot_2018-11-30_at_2.37.16_PM_bcjoi1.png">
+	<meta property="og:image:secure_url" content="https://res.cloudinary.com/chris-del/image/upload/v1543606677/Screen_Shot_2018-11-30_at_2.37.16_PM_bcjoi1.png">
+	<meta property="og:url" content="https://chrisdel101.github.io/vueClock/">
+	<meta property="type" content="website">
+	<meta property="title" content="Vue Clock">
+	<meta property="descriptions" content="Take pictures of clocks set to specific times.">
 	<meta property="og:image:type" content="image/png">
 	<meta property="og:image:width" content="200">
 	<meta property="og:image:height" content="500">
@@ -414,7 +418,6 @@
 					this.twitter()
 				} else if (e.target.className.includes('facebook')) {
 					this.facebook()
-				} else if (e.target.className.includes('reddit')) {
 
 				} else if (e.target.className.includes('reddit')) {
 
@@ -442,7 +445,7 @@
 					// use UI method to open dialouge and share site
 					FB.ui({
 						method: 'share',
-						href: `http://place-puppy.com`,
+						href: `https://chrisdel101.github.io/vueClock/`,
 					}, function(response) {
 						console.log(response)
 					})
@@ -450,8 +453,8 @@
 			},
 			twitter: function() {
 				// OPEN INTENT
-				let text = "Check out the cool clock images"
-				let link = `http://place-puppy.com`
+				let text = "Create images of clocks set to custom times"
+				let link = `https://chrisdel101.github.io/vueClock/`
 				let tweet = `https://twitter.com/intent/tweet?text=${text}&url=${link}`
 				// this.intent = tweet
 				// console.log(this.intent)
