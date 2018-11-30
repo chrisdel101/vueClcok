@@ -5,6 +5,12 @@ const path = require('path')
 const Twitter = require('twitter')
 const streamTransform = require('stream').Transform
 const Stream = require('stream')
+const {
+	Facebook,
+	FacebookApiException
+} = require('fb')
+// const fb = new Facebook(options)
+var cloudinary = require('cloudinary')
 
 
 
