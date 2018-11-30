@@ -8,7 +8,7 @@
 <script type="text/javascript" src="https://unpkg.com/html2canvas@1.0.0-alpha.12/dist/html2canvas.min.js"></script>
 <script type="text/javascript" src="https://unpkg.com/jso/dist/jso.js"></script>
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-
+<script src="https://sdk.accountkit.com/en_US/sdk.js"></script>
 <style media="screen">
 	.clock-block {
         position: relative;
@@ -181,6 +181,11 @@
 </style>
 
 <div id="app">
+	<meta property="og:image" content="https://www.guidedogs.org/wp-content/uploads/2018/01/Mobile.jpg">
+	<meta property="og:image:secure_url" content="https://www.guidedogs.org/wp-content/uploads/2018/01/Mobile.jpg">
+	<meta property="og:image:type" content="image/png">
+	<meta property="og:image:width" content="200">
+	<meta property="og:image:height" content="500">
 	<section id=controls>
 		<h1>Vue Clock</h1>
 		<el-dropdown @command="clockFaceDropdown" v-model="faceSelected">
@@ -442,13 +447,51 @@
 					fjs.parentNode.insertBefore(js, fjs);
 				}(document, 'script', 'facebook-jssdk'));
 				setTimeout(function() {
-					FB.ui({
-						method: 'share',
-						href: 'https://developers.facebook.com/docs/',
+					// window.FB.ui({
+					// 	method: 'share',
+					// 	href: `https://your.link`
+					// }, function(response) {
+					// 	console.log(response)
+					// })
+					var img = "https://www.guidedogs.org/wp-content/uploads/2018/01/Mobile.jpg"
+					var desc = "your caption here"
+					var title = 'your title here'
+					var link = `http://place-puppy.com`
+					window.FB.ui({
+						method: 'share_open_graph',
+						action_type: 'og.shares',
+						display: 'popup',
+						action_properties: JSON.stringify({
+							object: {
+								'og:url': `http://place-puppy.com`,
+								'og:title': 'your title here',
+								'og:description': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+								'og:image:url': `http://place-puppy.com/200x200`
+							}
+						})
 					}, function(response) {
-						console.log(response)
+						// Action after response
 					})
-				}, 100)
+					// 	var img = "/Users/chrisdielschnieder/desktop/code_work/vue/clock_html/app/test.png"
+					// 	var desc = "your caption here"
+					// 	var title = 'your title here'
+					// 	var link = `https://your.link.here?og_img=${img}`
+					// 	window.FB.ui({
+					// 		method: 'share_open_graph',
+					// 		action_type: 'og.shares',
+					// 		action_properties: JSON.stringify({
+					// 			object: {
+					// 				'og:url': link,
+					// 				'og:title': title,
+					// 				'og:description': desc,
+					// 				'og:image': img
+					// 			}
+					// 		})
+					// 	}, function(response) {
+					// 		// Debug response (optional)
+					// 		console.log(response)
+					// 	});
+				}, 300)
 				// let img = document.createElement('img')
 				// fetch('/test', {
 				// 		method: 'GET'

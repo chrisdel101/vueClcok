@@ -10,6 +10,7 @@ const {
 	FacebookApiException
 } = require('fb')
 // const fb = new Facebook(options)
+var cloudinary = require('cloudinary')
 
 
 
