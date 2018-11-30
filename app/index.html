@@ -426,8 +426,7 @@
 				}
 			},
 			facebook: function() {
-
-
+				// init FB
 				(function(d, s, id) {
 					var js, fjs = d.getElementsByTagName(s)[0];
 					if (d.getElementById(id)) {
@@ -440,7 +439,7 @@
 					fjs.parentNode.insertBefore(js, fjs)
 				}(document, 'script', 'facebook-jssdk'))
 				setTimeout(function() {
-
+					// use UI method to open dialouge and share site
 					FB.ui({
 						method: 'share',
 						href: `http://place-puppy.com`,
@@ -450,40 +449,41 @@
 				}, 300)
 			},
 			twitter: function() {
-				// `https://twitter.com/intent/tweet/${image}`
 				// OPEN INTENT
-				// let text = "Check out the cool clock images"
-				// let tweet = `https://twitter.com/intent/tweet?text=${text}`
+				let text = "Check out the cool clock images"
+				let link = `http://place-puppy.com`
+				let tweet = `https://twitter.com/intent/tweet?text=${text}&url=${link}`
 				// this.intent = tweet
 				// console.log(this.intent)
-				// this.twitterHref = tweet
-				// let twitterIcon = this.$refs.modal.$el.children["0"].children["0"].children[2].children["0"].children[1].children["0"]
-				// setTimeout(function() {
-				// 	twitterIcon.click()
-				//
-				// }, 100)
+				this.twitterHref = tweet
+				let twitterIcon = this.$refs.modal.$el.children["0"].children["0"].children[2].children["0"].children[1].children["0"]
 				console.log('twitter')
-				let image = this.canvasToImage()
-				console.log('image', image.substring(1, 150))
-				fetch('/twitter', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'image/png'
-					},
-					body: image
-				}).then((outerRes) => {
-					fetch('/twitter')
-						.then((innerRes) => {
-							console.log(innerRes)
-							const response2 = innerRes.blob()
-							return response2
-						})
-						.then((response) => {
-							// var objectURL = URL.createObjectURL(blob)
-							console.log(response)
+				setTimeout(function() {
+					twitterIcon.click()
 
-						})
-				})
+				}, 100)
+				// console.log('twitter')
+				// let image = this.canvasToImage()
+				// console.log('image', image.substring(1, 150))
+				// fetch('/twitter', {
+				// 	method: 'POST',
+				// 	headers: {
+				// 		'Content-Type': 'image/png'
+				// 	},
+				// 	body: image
+				// }).then((outerRes) => {
+				// 	fetch('/twitter')
+				// 		.then((innerRes) => {
+				// 			console.log(innerRes)
+				// 			const response2 = innerRes.blob()
+				// 			return response2
+				// 		})
+				// 		.then((response) => {
+				// 			// var objectURL = URL.createObjectURL(blob)
+				// 			console.log(response)
+				//
+				// 		})
+				// })
 
 				// test image is working
 				// this.$nextTick(function() {
