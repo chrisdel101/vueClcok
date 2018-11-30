@@ -418,7 +418,6 @@
 					this.twitter()
 				} else if (e.target.className.includes('facebook')) {
 					this.facebook()
-
 				} else if (e.target.className.includes('reddit')) {
 
 				} else if (e.target.className.includes('cog')) {
@@ -456,8 +455,7 @@
 				let text = "Create images of clocks set to custom times"
 				let link = `https://chrisdel101.github.io/vueClock/`
 				let tweet = `https://twitter.com/intent/tweet?text=${text}&url=${link}`
-				// this.intent = tweet
-				// console.log(this.intent)
+
 				this.twitterHref = tweet
 				let twitterIcon = this.$refs.modal.$el.children["0"].children["0"].children[2].children["0"].children[1].children["0"]
 				console.log('twitter')
@@ -465,36 +463,6 @@
 					twitterIcon.click()
 
 				}, 100)
-				// console.log('twitter')
-				// let image = this.canvasToImage()
-				// console.log('image', image.substring(1, 150))
-				// fetch('/twitter', {
-				// 	method: 'POST',
-				// 	headers: {
-				// 		'Content-Type': 'image/png'
-				// 	},
-				// 	body: image
-				// }).then((outerRes) => {
-				// 	fetch('/twitter')
-				// 		.then((innerRes) => {
-				// 			console.log(innerRes)
-				// 			const response2 = innerRes.blob()
-				// 			return response2
-				// 		})
-				// 		.then((response) => {
-				// 			// var objectURL = URL.createObjectURL(blob)
-				// 			console.log(response)
-				//
-				// 		})
-				// })
-
-				// test image is working
-				// this.$nextTick(function() {
-				// 	let img = document.createElement('img')
-				// 	img.src = image
-				// 	document.querySelector('#controls').appendChild(img)
-				// })
-
 
 			},
 			download: function() {
