@@ -52,24 +52,29 @@ https.createServer(function(req, res) {
 		if (req.method === 'GET') {
 			console.log('get req')
 			// console.log(typeof imageToClient)
-			console.log(imageToClient)
-			let params = {
-				command: 'STATUS',
-				media_id: imageToClient.media_id_string
-			}
-			console.log('params', params)
-			client.get('media/upload', params, function(error, upload, response) {
-				console.log('get made to status')
-				console.log('first', upload);
-			})
-			let params1 = {
-				command: 'STATUS',
-				media_id: imageToClient.media_id
-			}
-			client.get('media/upload', params1, function(error, upload, response) {
-				console.log('get made to status')
-				console.log('second', upload);
-			})
+			setTimeout(function() {
+				console.log(imageToClient)
+				let params = {
+					command: 'STATUS',
+					media_id: imageToClient.media_id_string
+				}
+				console.log('params', params)
+				client.get('media/upload', params, function(error, upload, response) {
+					if (error) console.error(error)
+					console.log('get made to status')
+					console.log('first', upload);
+					// console.log(response)
+				})
+
+			}, 5000)
+			// let params1 = {
+			// 	command: 'STATUS',
+			// 	media_id: imageToClient.media_id
+			// }
+			// client.get('media/upload', params1, function(error, upload, response) {
+			// 	console.log('get made to status')
+			// 	console.log('second', upload);
+			// })
 
 			// var params = {
 			// 	screen_name: 'The_Seperator'
@@ -84,7 +89,7 @@ https.createServer(function(req, res) {
 			res.end()
 		} else if (req.method === 'POST') {
 			console.log('post')
-			// receieves a POST
+			// receieves a POST with the image from client
 			let body = [];
 			new Promise((resolve, reject) => {
 					req.on('error', (err) => {
@@ -117,6 +122,7 @@ https.createServer(function(req, res) {
 				.then(base64Data => {
 					// console.log('below', base64Data.substring(1, 150))
 					base64Data = decodeBase64Image(base64Data)
+					// make image into file
 					let file = fs.writeFileSync('clock.png', base64Data.data, 'base64')
 
 
@@ -128,8 +134,9 @@ https.createServer(function(req, res) {
 					// 		console.log(tweets);
 					// 	}
 					// });
+					// read the file just made
 					let imageFile = fs.readFileSync('/Users/chrisdielschnieder/desktop/code_work/vue/clock_html/app/clock.png')
-					// console.log('image', image)
+					// upload image to twitter
 					client.post('media/upload', {
 						media: imageFile
 					}, function(error, media, response) {
@@ -137,17 +144,17 @@ https.createServer(function(req, res) {
 						if (!error) {
 							// If successful, a media object will be returned.
 							imageToClient = media
-							console.log('uploaded')
-							// var status = {
-							// 	status: 'I am a tweet',
-							// 	media_ids: media.media_id_string // Pass the media id string
-							// }
-							//
-							// client.post('statuses/update', status, function(error, tweet, response) {
-							// 	if (!error) {
-							// 		console.log(tweet);
-							// 	}
-							// });
+							console.log('uploaded', imageToClient)
+							var status = {
+								status: 'I am a tweet',
+								media_ids: media.media_id_string // Pass the media id string
+							}
+
+							client.post('statuses/update', status, function(error, tweet, response) {
+								if (!error) {
+									console.log(tweet);
+								}
+							});
 
 						}
 						console.log('Done')
@@ -209,3 +216,17 @@ https.createServer(function(req, res) {
 
 
 console.log("File Server is running on port 3000")
+
+
+
+// Error: HTTP Error: 400 Bad Request
+//     at Request._callback (/Users/me/desktop/code_work/vue/clock_html/app/node_modules/twitter/lib/twitter.js:221:9)
+//     at Request.self.callback (/Users/me/desktop/code_work/vue/clock_html/app/node_modules/request/request.js:185:22)
+//     at emitTwo (events.js:126:13)
+//     at Request.emit (events.js:214:7)
+//     at Request.<anonymous> (/Users/me/desktop/code_work/vue/clock_html/app/node_modules/request/request.js:1161:10)
+//     at emitOne (events.js:116:13)
+//     at Request.emit (events.js:211:7)
+//     at IncomingMessage.<anonymous> (/Users/me/desktop/code_work/vue/clock_html/app/node_modules/request/request.js:1083:12)
+//     at Object.onceWrapper (events.js:313:30)
+//     at emitNone (events.js:111:20)
