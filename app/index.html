@@ -426,14 +426,7 @@
 				}
 			},
 			facebook: function() {
-				// window.fbAsyncInit = function() {
-				// 	FB.init({
-				// 		appId: '331673361004110',
-				// 		autoLogAppEvents: true,
-				// 		xfbml: true,
-				// 		version: 'v3.2'
-				// 	});
-				// };
+
 
 				(function(d, s, id) {
 					var js, fjs = d.getElementsByTagName(s)[0];
@@ -441,95 +434,20 @@
 						return;
 					}
 					// console.log('inside')
-					js = d.createElement(s);
-					js.id = id;
-					js.src = "https://connect.facebook.net/en_US/sdk.js";
-					fjs.parentNode.insertBefore(js, fjs);
-				}(document, 'script', 'facebook-jssdk'));
+					js = d.createElement(s)
+					js.id = id
+					js.src = "https://connect.facebook.net/en_US/sdk.js"
+					fjs.parentNode.insertBefore(js, fjs)
+				}(document, 'script', 'facebook-jssdk'))
 				setTimeout(function() {
-					// window.FB.ui({
-					// 	method: 'share',
-					// 	href: `https://your.link`
-					// }, function(response) {
-					// 	console.log(response)
-					// })
-					var img = "https://www.guidedogs.org/wp-content/uploads/2018/01/Mobile.jpg"
-					var desc = "your caption here"
-					var title = 'your title here'
-					var link = `http://place-puppy.com`
-					window.FB.ui({
-						method: 'share_open_graph',
-						action_type: 'og.shares',
-						display: 'popup',
-						action_properties: JSON.stringify({
-							object: {
-								'og:url': `http://place-puppy.com`,
-								'og:title': 'your title here',
-								'og:description': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-								'og:image:url': `http://place-puppy.com/200x200`
-							}
-						})
+
+					FB.ui({
+						method: 'share',
+						href: `http://place-puppy.com`,
 					}, function(response) {
-						// Action after response
+						console.log(response)
 					})
-					// 	var img = "/Users/chrisdielschnieder/desktop/code_work/vue/clock_html/app/test.png"
-					// 	var desc = "your caption here"
-					// 	var title = 'your title here'
-					// 	var link = `https://your.link.here?og_img=${img}`
-					// 	window.FB.ui({
-					// 		method: 'share_open_graph',
-					// 		action_type: 'og.shares',
-					// 		action_properties: JSON.stringify({
-					// 			object: {
-					// 				'og:url': link,
-					// 				'og:title': title,
-					// 				'og:description': desc,
-					// 				'og:image': img
-					// 			}
-					// 		})
-					// 	}, function(response) {
-					// 		// Debug response (optional)
-					// 		console.log(response)
-					// 	});
 				}, 300)
-				// let img = document.createElement('img')
-				// fetch('/test', {
-				// 		method: 'GET'
-				// 	})
-				// 	.then(res => {
-				// 		const reader = res.body.getReader()
-				// 		return new ReadableStream({
-				// 			start(controller) {
-				// 				return pump();
-				//
-				// 				function pump() {
-				// 					return reader.read().then(({
-				// 						done,
-				// 						value
-				// 					}) => {
-				// 						// When no more data needs to be consumed, close the stream
-				// 						if (done) {
-				// 							controller.close();
-				// 							return;
-				// 						}
-				// 						// Enqueue the next data chunk into our target stream
-				// 						controller.enqueue(value);
-				// 						return pump();
-				// 					});
-				// 				}
-				// 			}
-				// 		})
-				// 	})
-				// 	.then(stream => new Response(stream))
-				// 	.then(response => response.blob())
-				// 	.then(blob => URL.createObjectURL(blob))
-				// 	.then(url => {
-				// 		img.src = url
-				// 		console.log(img.src)
-				// 	})
-				// 	.catch(err => console.error(err));
-
-
 			},
 			twitter: function() {
 				// `https://twitter.com/intent/tweet/${image}`
@@ -561,7 +479,7 @@
 							return response2
 						})
 						.then((response) => {
-							// var objectURL = URL.createObjectURL(blob);
+							// var objectURL = URL.createObjectURL(blob)
 							console.log(response)
 
 						})
