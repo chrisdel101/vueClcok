@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 
-
+<meta property="og:image" content="http://res.cloudinary.com/chris-del/image/upload/v1543606677/Screen_Shot_2018-11-30_at_2.37.16_PM_bcjoi1.png">
+<meta property="og:image:secure_url" content="https://res.cloudinary.com/chris-del/image/upload/v1543606677/Screen_Shot_2018-11-30_at_2.37.16_PM_bcjoi1.png">
+<meta property="og:url" content="https://chrisdel101.github.io/vueClock/">
+<meta property="type" content="website">
+<meta property="title" content="Vue Clock">
+<meta property="descriptions" content="Take pictures of clocks set to specific times.">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="200">
+<meta property="og:image:height" content="500">
 
 <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 <script src="https://use.fontawesome.com/8f6adc7e15.js"></script>
@@ -181,15 +189,6 @@
 </style>
 
 <div id="app">
-	<meta property="og:image" content="http://res.cloudinary.com/chris-del/image/upload/v1543606677/Screen_Shot_2018-11-30_at_2.37.16_PM_bcjoi1.png">
-	<meta property="og:image:secure_url" content="https://res.cloudinary.com/chris-del/image/upload/v1543606677/Screen_Shot_2018-11-30_at_2.37.16_PM_bcjoi1.png">
-	<meta property="og:url" content="https://chrisdel101.github.io/vueClock/">
-	<meta property="type" content="website">
-	<meta property="title" content="Vue Clock">
-	<meta property="descriptions" content="Take pictures of clocks set to specific times.">
-	<meta property="og:image:type" content="image/png">
-	<meta property="og:image:width" content="200">
-	<meta property="og:image:height" content="500">
 	<section id=controls>
 		<h1>Vue Clock</h1>
 		<el-dropdown @command="clockFaceDropdown" v-model="faceSelected">
@@ -461,7 +460,6 @@
 				console.log('twitter')
 				setTimeout(function() {
 					twitterIcon.click()
-
 				}, 100)
 
 			},
