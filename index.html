@@ -260,16 +260,6 @@
 						iconId: 'facebook',
 						faClass: 'fa-facebook',
 						href: '#'
-					},
-					{
-						iconId: 'reddit',
-						faClass: 'fa-reddit',
-						href: '#'
-					},
-					{
-						iconId: 'cog',
-						faClass: 'fa-cog',
-						href: '#'
 					}
 				],
 				footer: '',
@@ -417,37 +407,25 @@
 					this.twitter()
 				} else if (e.target.className.includes('facebook')) {
 					this.facebook()
-				} else if (e.target.className.includes('reddit')) {
-
 				} else if (e.target.className.includes('cog')) {
-
+					this.settings()
 				} else {
 					// error, icon not hooked up
 					alert('Error: that icon is invalid.')
 				}
 			},
-			facebook: function() {
-				// init FB
-				(function(d, s, id) {
-					var js, fjs = d.getElementsByTagName(s)[0];
-					if (d.getElementById(id)) {
-						return;
-					}
-					// console.log('inside')
-					js = d.createElement(s)
-					js.id = id
-					js.src = "https://connect.facebook.net/en_US/sdk.js"
-					fjs.parentNode.insertBefore(js, fjs)
-				}(document, 'script', 'facebook-jssdk'))
+			download: function() {
+				// https://stackoverflow.com/questions/8126623/downloading-canvas-element-to-an-image
+				let downloadIcon = this.$refs.modal.$el.children["0"].children["0"].children[2].children["0"].children["0"].children["0"]
+				// make canvas an image
+				let image = this.canvasToImage()
+				this.downloadHref = image
+				// timeout to set href properly
 				setTimeout(function() {
-					// use UI method to open dialouge and share site
-					FB.ui({
-						method: 'share',
-						href: `https://chrisdel101.github.io/vueClock/`,
-					}, function(response) {
-						console.log(response)
-					})
-				}, 300)
+					downloadIcon.click()
+
+				}, 100)
+				this.downloadImageStore = image
 			},
 			twitter: function() {
 				// OPEN INTENT
@@ -463,18 +441,31 @@
 				}, 100)
 
 			},
-			download: function() {
-				// https://stackoverflow.com/questions/8126623/downloading-canvas-element-to-an-image
-				let downloadIcon = this.$refs.modal.$el.children["0"].children["0"].children[2].children["0"].children["0"].children["0"]
-				// make canvas an image
-				let image = this.canvasToImage()
-				this.downloadHref = image
-				// timeout to set href properly
+			facebook: function() {
+				// init FB
+				(function(d, s, id) {
+					var js, fjs = d.getElementsByTagName(s)[0];
+					if (d.getElementById(id)) {
+						return;
+					}
+					// console.log('inside')
+					js = d.createElement(s)
+					js.id = id
+					js.src = "https://connect.facebook.net/en_US/sdk.js"
+					fjs.parentNode.insertBefore(js, fjs)
+				}(document, 'script', 'facebook-jssdk'))
+				// timer to allow time to make call
 				setTimeout(function() {
-					downloadIcon.click()
-
-				}, 100)
-				this.downloadImageStore = image
+					FB.ui({
+						method: 'share',
+						href: `https://chrisdel101.github.io/vueClock/`,
+					}, function(response) {
+						console.log(response)
+					})
+				}, 300)
+			},
+			settings: function() {
+				console.log('test')
 			},
 			canvasToImage: function() {
 				let canvas = this.$refs.modal.$el.children[0].children[0].children[2].children[1]
@@ -501,7 +492,6 @@
 
 				this.$nextTick(function() {
 					html2canvas(clock, {
-						backgroundColor: 'blue',
 						useCORS: true,
 					}).then(function(canvas) {
 						let oldCanvas = document.querySelector('canvas')
