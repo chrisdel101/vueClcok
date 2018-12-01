@@ -1,4 +1,6 @@
 # vueClock
-An interactive clock that ticks. The clock can be stoppped and restarted as well as set to any custonm time.
+An interactive clock that ticks. 
+
+Set the clock to a custom time, snap a shot, then download the image.
 
 [Demo](https://codepen.io/chri_del/full/qJQKLY/")
